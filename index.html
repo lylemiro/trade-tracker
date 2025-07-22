@@ -1,0 +1,1836 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trade Progress Tracker</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --background-color-light: #f4f7f6;
+            --text-color-light: #333;
+            --card-background-light: #ffffff;
+            --border-color-light: #e0e0e0;
+            --header-background-light: #007bff;
+            --header-text-light: #ffffff;
+            --positive-color: #28a745; /* Green for gains/wins */
+            --negative-color: #dc3545; /* Red for losses */
+            --button-background: #007bff;
+            --button-text: #ffffff;
+            --input-background: #fdfdfd;
+            --input-border: #ccc;
+            --accent-color: #007bff;
+        }
+
+        [data-theme="dark"] {
+            --background-color-light: #2c2c2c;
+            --text-color-light: #f0f0f0;
+            --card-background-light: #3a3a3a;
+            --border-color-light: #444;
+            --header-background-light: #1e88e5;
+            --header-text-light: #f0f0f0;
+            --positive-color: #4CAF50;
+            --negative-color: #f44336;
+            --button-background: #1e88e5;
+            --button-text: #f0f0f0;
+            --input-background: #4a4a4a;
+            --input-border: #666;
+            --accent-color: #1e88e5;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: var(--background-color-light);
+            color: var(--text-color-light);
+            transition: background-color 0.3s ease, color 0.3s ease;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        header {
+            grid-column: 1 / -1;
+            background-color: var(--header-background-light);
+            color: var(--header-text-light);
+            padding: 25px 30px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px; /* Added gap for buttons */
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 2.5em;
+            letter-spacing: 0.05em;
+        }
+
+        .header-buttons {
+            display: flex;
+            gap: 10px; /* Space between buttons in header */
+        }
+
+        .theme-toggle-button, .reset-button-header { /* Renamed for clarity in CSS */
+            background: none;
+            border: 2px solid var(--header-text-light);
+            color: var(--header-text-light);
+            padding: 10px 15px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .theme-toggle-button:hover, .reset-button-header:hover {
+            background-color: var(--header-text-light);
+            color: var(--header-background-light);
+        }
+
+        .card {
+            background-color: var(--card-background-light);
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            overflow: hidden;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .card h2 {
+            margin-top: 0;
+            color: var(--accent-color);
+            font-size: 1.6em;
+            border-bottom: 2px solid var(--border-color-light);
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+
+        .card-content {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            flex-grow: 1;
+        }
+
+        .card-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 5px;
+        }
+
+        .card-row strong {
+            font-weight: 600;
+        }
+
+        .value {
+            font-weight: bold;
+            font-size: 1.1em;
+            text-align: right;
+            flex-grow: 1;
+        }
+
+        .positive {
+            color: var(--positive-color);
+        }
+
+        .negative {
+            color: var(--negative-color);
+        }
+
+        input[type="number"],
+        textarea,
+        button {
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid var(--input-border);
+            font-size: 1em;
+            width: 100%;
+            box-sizing: border-box;
+            background-color: var(--input-background);
+            color: var(--text-color-light);
+            transition: border-color 0.2s ease, background-color 0.2s ease;
+        }
+
+        input[type="number"]:focus,
+        textarea:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.2);
+        }
+
+        .card-row input[type="number"] {
+            flex-grow: 1;
+            max-width: 50%;
+            text-align: right;
+        }
+
+        button {
+            background-color: var(--button-background);
+            color: var(--button-text);
+            cursor: pointer;
+            border: none;
+            margin-top: 15px;
+            transition: background-color 0.2s ease, transform 0.1s ease;
+        }
+
+        button:hover {
+            background-color: var(--accent-color);
+            transform: translateY(-2px);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .chart-container {
+            position: relative;
+            height: 300px;
+            max-height: 350px;
+            width: 100%;
+            margin-top: 15px;
+        }
+
+        .trade-data-card {
+            grid-column: 1 / -1;
+        }
+
+        #tradeHistoryOutput {
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid var(--border-color-light);
+            border-radius: 8px;
+            padding: 15px;
+            background-color: var(--input-background);
+            margin-top: 20px;
+        }
+
+        .trade-entry {
+            border-bottom: 1px dashed var(--border-color-light);
+            padding: 10px 0;
+            margin-bottom: 10px;
+        }
+
+        .trade-entry:last-child {
+            border-bottom: none;
+        }
+
+        /* Mobile Optimization */
+        @media (max-width: 768px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+            header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+            header h1 {
+                font-size: 2em;
+            }
+            .card-row input[type="number"] {
+                max-width: 100%;
+            }
+        }
+
+        /* Styles for the red reset button at the bottom */
+        .reset-button-bottom-container {
+            grid-column: 1 / -1; /* Span full width */
+            text-align: center;
+            margin-top: 20px;
+            padding: 10px;
+        }
+
+        .reset-button-bottom {
+            background-color: #dc3545; /* Red color */
+            color: white;
+            border: 2px solid #dc3545;
+            padding: 15px 30px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1.1em;
+            transition: background-color 0.2s ease, transform 0.1s ease, border-color 0.2s ease;
+        }
+
+        .reset-button-bottom:hover {
+            background-color: #c82333; /* Darker red on hover */
+            border-color: #bd2130;
+            transform: translateY(-2px);
+        }
+
+        .reset-button-bottom:active {
+            transform: translateY(0);
+        }
+
+        /* Modal Styles */
+        .setup-modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.85);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+
+        .setup-modal-overlay.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .setup-modal-content {
+            background-color: var(--card-background-light);
+            color: var(--text-color-light);
+            padding: 30px;
+            border-radius: 12px;
+            max-width: 600px;
+            width: 90%;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            transform: translateY(20px);
+            transition: transform 0.3s ease;
+        }
+
+        .setup-modal-overlay.visible .setup-modal-content {
+            transform: translateY(0);
+        }
+
+        .setup-modal-content h2 {
+            color: var(--accent-color);
+            margin-top: 0;
+            font-size: 2em;
+            border-bottom: 2px solid var(--border-color-light);
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+
+        .setup-modal-content p {
+            font-size: 1.1em;
+            margin-bottom: 15px;
+            text-align: left;
+        }
+
+        .setup-modal-content ol, .setup-modal-content ul {
+            text-align: left;
+            margin-bottom: 15px;
+            padding-left: 20px;
+        }
+        .setup-modal-content li {
+            margin-bottom: 8px;
+        }
+
+        .setup-modal-navigation {
+            margin-top: 25px;
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+        }
+
+        .setup-modal-navigation button {
+            flex: 1;
+            padding: 12px 20px;
+            border-radius: 8px;
+            border: none;
+            background-color: var(--button-background);
+            color: var(--button-text);
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.2s ease, transform 0.1s ease;
+        }
+
+        .setup-modal-navigation button:hover {
+            background-color: var(--accent-color);
+            transform: translateY(-2px);
+        }
+
+        .setup-modal-navigation button:disabled {
+            background-color: var(--input-border);
+            cursor: not-allowed;
+            transform: translateY(0);
+        }
+
+        .setup-modal-navigation .start-tracking-button {
+            background-color: var(--positive-color);
+        }
+        .setup-modal-navigation .start-tracking-button:hover {
+            background-color: #218838;
+        }
+
+        .setup-modal-progress {
+            margin-top: 15px;
+            font-size: 0.9em;
+            color: #777;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Trade Progress Dashboard</h1>
+        <div class="header-buttons">
+            <button class="theme-toggle-button" id="themeToggle">Toggle Theme</button>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="card" id="financialGoalsCard">
+            <h2>Financial Goals & Progress</h2>
+            <div class="card-content">
+                <div class="card-row">
+                    <span>USDT/PHP Rate:</span>
+                    <input type="number" id="usdtPhpRate" value="56.81" step="0.01">
+                </div>
+                <div class="card-row">
+                    <span>Target Monthly Income (₱):</span>
+                    <input type="number" id="targetMonthlyIncomePhp" value="50000" step="100">
+                </div>
+                <div class="card-row">
+                    <span>Starting Balance (USDT):</span>
+                    <input type="number" id="startingBalanceUsdt" value="301" step="0.01">
+                </div>
+                <div class="card-row">
+                    <span><strong>Target Balance (USDT):</strong></span>
+                    <span id="targetBalanceUsdt" class="value"></span>
+                </div>
+                <div class="card-row">
+                    <span><strong>Target Balance (₱):</strong></span>
+                    <span id="targetBalancePhp" class="value"></span>
+                </div>
+                <div class="card-row">
+                    <span><strong>Total Gains (USDT):</strong></span>
+                    <span id="totalGainsUsdt" class="value"></span>
+                </div>
+                <div class="card-row">
+                    <span><strong>Total Gains (₱):</strong></span>
+                    <span id="totalGainsPhp" class="value"></span>
+                </div>
+                <div class="card-row">
+                    <span><strong>Days Remaining to Target:</strong></span>
+                    <span id="daysRemaining" class="value"></span>
+                </div>
+                <div class="card-row">
+                    <span><strong>Wallet Balance Needed:</strong></span>
+                    <span id="walletBalanceNeeded" class="value"></span>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>Balance Overview</h2>
+            <div class="card-content">
+                <div class="card-row">
+                    <span>Previous Balance (USDT):</span>
+                    <span id="previousBalanceUsdt" class="value"></span>
+                </div>
+                <div class="card-row">
+                    <span>Previous Balance (₱):</span>
+                    <span id="previousBalancePhp" class="value"></span>
+                </div>
+                <div class="card-row">
+                    <span>Calculated Balance (USDT):</span>
+                    <span id="calculatedBalanceUsdt" class="value"></span>
+                </div>
+                <div class="card-row">
+                    <span>Calculated Balance (₱):</span>
+                    <span id="calculatedBalancePhp" class="value"></span>
+                </div>
+                <hr style="width:100%; border:0; border-top:1px solid var(--border-color-light); margin: 10px 0;">
+                <div class="card-row">
+                    <span>Actual Current Balance (USDT):</span>
+                    <input type="number" id="actualCurrentBalanceUsdtInput" value="0" step="0.01">
+                </div>
+                <div class="card-row">
+                    <span><strong>Discrepancy (USDT):</strong></span>
+                    <span id="discrepancyUsdt" class="value"></span>
+                </div>
+                <div class="card-row">
+                    <span><strong>Discrepancy (₱):</strong></span>
+                    <span id="discrepancyPhp" class="value"></span>
+                </div>
+                <p style="font-size: 0.8em; color: #666;">Discrepancy = Actual - Calculated. Positive means extra funds (deposits, bonuses, errors). Negative means missing funds (withdrawals, fees, unlogged losses).</p>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>Gains Summary</h2>
+            <div class="card-content">
+                <div class="card-row">
+                    <span>Current Gain (USDT):</span>
+                    <span id="currentGainUsdt" class="value"></span>
+                </div>
+                <div class="card-row">
+                    <span>Current Gain (₱):</span>
+                    <span id="currentGainPhp" class="value"></span>
+                </div>
+                <div class="card-row">
+                    <span>Current ROI:</span>
+                    <span id="currentRoi" class="value"></span>
+                </div>
+                <div class="card-row">
+                    <span>Previous Gain (USDT):</span>
+                    <span id="previousGainUsdt" class="value"></span>
+                </div>
+                <div class="card-row">
+                    <span>Gain Difference (USDT):</span>
+                    <span id="gainDifferenceUsdt" class="value"></span>
+                </div>
+                <div class="card-row">
+                    <span>Gain Difference (₱):</span>
+                    <span id="gainDifferencePhp" class="value"></span>
+                </div>
+                <div class="card-row">
+                    <span>Last Trade Amount (USDT):</span>
+                    <span id="lastTradeAmountUsdt" class="value"></span>
+                </div>
+                <div class="card-row">
+                    <span>Trade Amount Growth:</span>
+                    <span id="tradeAmountGrowth" class="value"></span>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>Streak Analytics</h2>
+            <div class="card-content">
+                <div class="card-row">
+                    <span><strong>Current Win Streak:</strong></span>
+                    <span id="currentWinStreak" class="value positive">0</span>
+                </div>
+                <div class="card-row">
+                    <span><strong>Longest Win Streak:</strong></span>
+                    <span id="longestWinStreak" class="value positive">0</span>
+                </div>
+                <div class="card-row">
+                    <span><strong>Current Loss Streak:</strong></span>
+                    <span id="currentLossStreak" class="value negative">0</span>
+                </div>
+                <div class="card-row">
+                    <span><strong>Longest Loss Streak:</strong></span>
+                    <span id="longestLossStreak" class="value negative">0</span>
+                </div>
+                <div class="card-row">
+                    <span><strong>Total Trades:</strong></span>
+                    <span id="totalTrades" class="value">0</span>
+                </div>
+                <div class="card-row">
+                    <span><strong>Total Wins:</strong></span>
+                    <span id="totalWins" class="value positive">0</span>
+                </div>
+                <div class="card-row">
+                    <span><strong>Total Losses:</strong></span>
+                    <span id="totalLosses" class="value negative">0</span>
+                </div>
+                <div class="card-row">
+                    <span><strong>Win Rate:</strong></span>
+                    <span id="winRate" class="value">0%</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="card chart-card">
+            <h2>Monthly PNL Progress</h2>
+            <div class="chart-container">
+                <canvas id="monthlyPnLChart"></canvas>
+            </div>
+        </div>
+
+        <div class="card chart-card">
+            <h2>Monthly Trade Volume</h2>
+            <div class="chart-container">
+                <canvas id="monthlyVolumeChart"></canvas>
+            </div>
+        </div>
+
+        <div class="card chart-card">
+            <h2>Daily PNL Progress</h2>
+            <div class="chart-container">
+                <canvas id="dailyPnLChart"></canvas>
+            </div>
+        </div>
+
+        <div class="card chart-card">
+            <h2>Daily Trade Volume</h2>
+            <div class="chart-container">
+                <canvas id="dailyVolumeChart"></canvas>
+            </div>
+        </div>
+
+        <div class="card chart-card">
+            <h2>Daily ROI Progress</h2>
+            <div class="chart-container">
+                <canvas id="dailyRoiChart"></canvas>
+            </div>
+        </div>
+
+        <div class="card chart-card">
+            <h2>Balance Discrepancy Over Time</h2>
+            <div class="chart-container">
+                <canvas id="discrepancyChart"></canvas>
+            </div>
+        </div>
+
+        <div class="card chart-card">
+            <h2>Cumulative Balance Progress</h2>
+            <div class="chart-container">
+                <canvas id="cumulativeBalanceChart"></canvas>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>Trading Schedule Planner</h2>
+            <div class="card-content">
+                <textarea id="schedulePlannerInput" rows="5" placeholder="e.g., Monday: 9 AM - 12 PM, Focus on BTC/USDT..."></textarea>
+                <p>Your schedule will auto-save.</p>
+            </div>
+        </div>
+
+        <div class="card trade-data-card">
+            <h2>Input Detailed Trade History</h2>
+            <textarea id="tradeDataInput" rows="15" placeholder="
+Instructions for pasting DETAILED trade history:
+
+1.  **Copy all your detailed trade records directly.**
+2.  **Each trade block MUST start with a crypto pair (e.g., 'BTC/USDT').**
+3.  **Each piece of data (label and value) should be on a single line, separated by a single space.**
+    * Example: `Time 2025-07-22 19:04`
+    * Example: `PNL +2.36 USDT`
+    * Example: `Order No. 579579592027456`
+4.  Blank lines between trade blocks are fine.
+5.  Lines that don't match expected patterns (like empty 'Side'/'Result' labels) will be ignored.
+
+**Example of the expected format:**
+
+BTC/USDT
+NO. 25068412
+Order No. 579579592027456
+Time 2025-07-22 19:04
+Opening Time 2025-07-22 19:15
+Settlement Time 2025-07-22 19:20
+Amount 3.19 USDT
+Open Price (USDT) 118,913.38
+Close Price (USDT) 118,913.49
+PNL +2.36 USDT
+ROI ≈ 73.98 %
+Odd 74.16 %
+Effective trading volume 3.19 USDT
+
+(Continue pasting more detailed trade blocks separated by a blank line)"
+></textarea>
+            <button id="processDataButton">Process Detailed Trades</button>
+        </div>
+
+        <div class="card trade-data-card">
+            <h3>Processed Trade History:</h3>
+            <div id="tradeHistoryOutput">
+                <p>No trade data processed yet.</p>
+            </div>
+        </div>
+
+        <div class="reset-button-bottom-container">
+            <button class="reset-button-bottom" id="resetDataButtonBottom">Reset All Data</button>
+        </div>
+    </div>
+
+    <audio id="winSound" src="https://www.soundjay.com/buttons/beep-07.mp3" preload="auto"></audio>
+    <audio id="lossSound" src="https://www.soundjay.com/buttons/beep-06.mp3" preload="auto"></audio>
+
+    <div class="setup-modal-overlay" id="setupModalOverlay">
+        <div class="setup-modal-content">
+            <h2 id="setupModalTitle">Welcome to Your Trade Tracker!</h2>
+            <div id="setupModalBody">
+                </div>
+            <div class="setup-modal-navigation">
+                <button id="setupPrevButton" disabled>Previous</button>
+                <button id="setupNextButton">Next</button>
+                <button id="setupStartButton" class="start-tracking-button" style="display: none;">Start Tracking!</button>
+            </div>
+            <div class="setup-modal-progress">
+                Step <span id="currentStepNumber">1</span> of <span id="totalStepsNumber"></span>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        // --- DOM Elements ---
+        const usdtPhpRateInput = document.getElementById('usdtPhpRate');
+        const targetMonthlyIncomePhpInput = document.getElementById('targetMonthlyIncomePhp');
+        const startingBalanceUsdtInput = document.getElementById('startingBalanceUsdt');
+        const targetBalanceUsdtEl = document.getElementById('targetBalanceUsdt');
+        const targetBalancePhpEl = document.getElementById('targetBalancePhp');
+        const totalGainsUsdtEl = document.getElementById('totalGainsUsdt');
+        const totalGainsPhpEl = document.getElementById('totalGainsPhp');
+        const daysRemainingEl = document.getElementById('daysRemaining');
+        const walletBalanceNeededEl = document.getElementById('walletBalanceNeeded');
+        const previousBalanceUsdtEl = document.getElementById('previousBalanceUsdt');
+        const previousBalancePhpEl = document.getElementById('previousBalancePhp');
+        const calculatedBalanceUsdtEl = document.getElementById('calculatedBalanceUsdt');
+        const calculatedBalancePhpEl = document.getElementById('calculatedBalancePhp');
+        const actualCurrentBalanceUsdtInput = document.getElementById('actualCurrentBalanceUsdtInput');
+        const discrepancyUsdtEl = document.getElementById('discrepancyUsdt');
+        const discrepancyPhpEl = document.getElementById('discrepancyPhp');
+        const currentGainUsdtEl = document.getElementById('currentGainUsdt');
+        const currentGainPhpEl = document.getElementById('currentGainPhp');
+        const currentRoiEl = document.getElementById('currentRoi');
+        const previousGainUsdtEl = document.getElementById('previousGainUsdt');
+        const gainDifferenceUsdtEl = document.getElementById('gainDifferenceUsdt');
+        const gainDifferencePhpEl = document.getElementById('gainDifferencePhp');
+        const lastTradeAmountUsdtEl = document.getElementById('lastTradeAmountUsdt');
+        const tradeAmountGrowthEl = document.getElementById('tradeAmountGrowth');
+        const currentWinStreakEl = document.getElementById('currentWinStreak');
+        const longestWinStreakEl = document.getElementById('longestWinStreak');
+        const currentLossStreakEl = document.getElementById('currentLossStreak');
+        const longestLossStreakEl = document.getElementById('longestLossStreak');
+        const totalTradesEl = document.getElementById('totalTrades');
+        const totalWinsEl = document.getElementById('totalWins');
+        const totalLossesEl = document.getElementById('totalLosses');
+        const winRateEl = document.getElementById('winRate');
+        const tradeDataInput = document.getElementById('tradeDataInput');
+        const processDataButton = document.getElementById('processDataButton');
+        const themeToggleButton = document.getElementById('themeToggle');
+        const resetDataButtonBottom = document.getElementById('resetDataButtonBottom');
+        const schedulePlannerInput = document.getElementById('schedulePlannerInput');
+        const tradeHistoryOutput = document.getElementById('tradeHistoryOutput');
+        const winSound = document.getElementById('winSound');
+        const lossSound = document.getElementById('lossSound');
+
+        // Setup Modal Elements
+        const setupModalOverlay = document.getElementById('setupModalOverlay');
+        const setupModalTitle = document.getElementById('setupModalTitle');
+        const setupModalBody = document.getElementById('setupModalBody');
+        const setupPrevButton = document.getElementById('setupPrevButton');
+        const setupNextButton = document.getElementById('setupNextButton');
+        const setupStartButton = document.getElementById('setupStartButton');
+        const currentStepNumber = document.getElementById('currentStepNumber');
+        const totalStepsNumber = document.getElementById('totalStepsNumber');
+
+
+        // --- Chart Instances (Declare globally so they can be accessed/updated) ---
+        let monthlyPnLChart = null;
+        let monthlyVolumeChart = null;
+        let dailyRoiChart = null;
+        let dailyPnLChart = null;
+        let dailyVolumeChart = null;
+        let discrepancyChart = null;
+        let cumulativeBalanceChart = null; // New Cumulative Balance chart instance
+
+        // --- Data Storage (will be loaded/saved to localStorage) ---
+        const DEFAULT_APP_SETTINGS = {
+            usdtPhpRate: 57.11,
+            targetMonthlyIncomePhp: 50000,
+            startingBalanceUsdt: 301,
+            theme: 'light',
+            schedulePlanner: ''
+        };
+        const DEFAULT_BALANCE_DATA = {
+            previousBalanceUsdt: 0,
+            calculatedBalanceUsdt: 0,
+            actualBalanceUsdt: 0,
+        };
+        const DEFAULT_LAST_TRADE_STATS = {
+            currentGainUsdt: 0,
+            currentRoi: 0,
+            previousGainUsdt: 0,
+            lastTradeAmount: 0,
+            previousTradeAmount: 0
+        };
+        const DEFAULT_DISCREPANCY_HISTORY = [];
+        const DEFAULT_CUMULATIVE_BALANCE_HISTORY = []; // New default for cumulative balance history
+
+        let tradeHistory = [];
+        let appSettings = { ...DEFAULT_APP_SETTINGS };
+        let balanceData = { ...DEFAULT_BALANCE_DATA };
+        let lastTradeStats = { ...DEFAULT_LAST_TRADE_STATS };
+        let discrepancyHistory = [];
+        let cumulativeBalanceHistory = []; // New array for cumulative balance history
+
+        // --- Setup Modal State ---
+        let currentSetupStep = 0;
+        const setupSteps = [
+            {
+                title: "Welcome to Your Trade Tracker!",
+                body: `
+                    <p>This tracker helps you monitor your trading progress, visualize gains, and reconcile your wallet balance. Let's set it up!</p>
+                    <p>Click 'Next' to proceed through the guided setup.</p>
+                `
+            },
+            {
+                title: "Step 1: Set Your Starting Balance",
+                body: `
+                    <p>Go to the <strong>'Financial Goals & Progress'</strong> card.</p>
+                    <p>Enter your initial trading capital in the <strong>'Starting Balance (USDT)'</strong> field. This is the balance you began with *before* any of the trades you'll be tracking.</p>
+                    <p>Adjust the 'USDT/PHP Rate' and 'Target Monthly Income' as needed.</p>
+                `
+            },
+            {
+                title: "Step 2: Paste Your Detailed Trade History",
+                body: `
+                    <p>Copy your detailed trade history from your exchange. It should look like the example below the input box.</p>
+                    <p>Paste it into the <strong>'Input Detailed Trade History'</strong> textarea.</p>
+                    <p>Click <strong>'Process Detailed Trades'</strong>. Your trades will appear below and metrics will update.</p>
+                    <p style="font-size: 0.9em; color: #888;">*The tracker will automatically ignore header text and process only valid trade blocks.*</p>
+                `
+            },
+            {
+                title: "Step 3: Update Your Actual Current Balance",
+                body: `
+                    <p>Go to the <strong>'Balance Overview'</strong> card.</p>
+                    <p>Check your live balance on your exchange and enter it into the <strong>'Actual Current Balance (USDT)'</strong> field.</p>
+                    <p>The tracker will immediately calculate the discrepancy.</p>
+                `
+            },
+            {
+                title: "Step 4: Understand Discrepancy",
+                body: `
+                    <p>The <strong>'Discrepancy'</strong> value (Actual - Calculated) in the 'Balance Overview' shows any unaccounted funds.</p>
+                    <ul>
+                        <li><strong>Positive:</strong> May be deposits, bonuses, or compensations not in your trade history.</li>
+                        <li><strong>Negative:</strong> May be withdrawals, fees, or unlogged losses.</li>
+                    </ul>
+                    <p>The 'Balance Discrepancy Over Time' chart will track this.</p>
+                `
+            },
+            {
+                title: "Step 5: Continue Tracking!",
+                body: `
+                    <p>You're all set up!</p>
+                    <p>Periodically paste new trade history to keep your tracker up-to-date. Remember to also update your 'Actual Current Balance' regularly.</p>
+                    <p>If you ever need to start fresh, use the red 'Reset All Data' button at the bottom.</p>
+                    <p>Happy tracking!</p>
+                `
+            }
+        ];
+
+
+        // --- Helper Functions ---
+
+        function cleanLine(line) {
+            return line.replace(/[\u00A0\u200B-\u200D\uFEFF]/g, ' ')
+                       .replace(/\s+/g, ' ')
+                       .trim();
+        }
+
+        function formatCurrency(amount, currency = 'USDT') {
+            return `${amount.toFixed(2)} ${currency}`;
+        }
+
+        function formatPhp(amount) {
+            return `₱${amount.toFixed(2)}`;
+        }
+
+        function formatPercentage(value) {
+            return `${value.toFixed(2)} %`;
+        }
+
+        function playSound(type) {
+            if (type === 'win') {
+                winSound.play().catch(e => console.error("Error playing win sound:", e));
+            } else if (type === 'loss') {
+                lossSound.play().catch(e => console.error("Error playing loss sound:", e));
+            }
+        }
+
+        // --- Local Storage Management ---
+
+        function saveState() {
+            localStorage.setItem('tradeHistory', JSON.stringify(tradeHistory));
+            localStorage.setItem('appSettings', JSON.stringify(appSettings));
+            localStorage.setItem('balanceData', JSON.stringify(balanceData));
+            localStorage.setItem('lastTradeStats', JSON.stringify(lastTradeStats));
+            localStorage.setItem('discrepancyHistory', JSON.stringify(discrepancyHistory));
+            localStorage.setItem('cumulativeBalanceHistory', JSON.stringify(cumulativeBalanceHistory)); // Save cumulative balance history
+        }
+
+        function loadState() {
+            const savedTradeHistory = localStorage.getItem('tradeHistory');
+            const savedAppSettings = localStorage.getItem('appSettings');
+            const savedBalanceData = localStorage.getItem('balanceData');
+            const savedLastTradeStats = localStorage.getItem('lastTradeStats');
+            const savedDiscrepancyHistory = localStorage.getItem('discrepancyHistory');
+            const savedCumulativeBalanceHistory = localStorage.getItem('cumulativeBalanceHistory'); // Load cumulative balance history
+
+            if (savedTradeHistory) {
+                tradeHistory = JSON.parse(savedTradeHistory);
+            }
+            if (savedAppSettings) {
+                Object.assign(appSettings, JSON.parse(savedAppSettings));
+            } else {
+                appSettings = { ...DEFAULT_APP_SETTINGS };
+            }
+            if (savedBalanceData) {
+                Object.assign(balanceData, JSON.parse(savedBalanceData));
+            } else {
+                balanceData = { ...DEFAULT_BALANCE_DATA };
+            }
+            if (savedLastTradeStats) {
+                Object.assign(lastTradeStats, JSON.parse(savedLastTradeStats));
+            }
+            if (savedDiscrepancyHistory) {
+                discrepancyHistory = JSON.parse(savedDiscrepancyHistory);
+            } else {
+                discrepancyHistory = [];
+            }
+            if (savedCumulativeBalanceHistory) {
+                cumulativeBalanceHistory = JSON.parse(savedCumulativeBalanceHistory); // Assign loaded history
+            } else {
+                cumulativeBalanceHistory = [];
+            }
+
+
+            usdtPhpRateInput.value = appSettings.usdtPhpRate;
+            targetMonthlyIncomePhpInput.value = appSettings.targetMonthlyIncomePhp;
+            startingBalanceUsdtInput.value = appSettings.startingBalanceUsdt;
+            actualCurrentBalanceUsdtInput.value = balanceData.actualBalanceUsdt;
+            schedulePlannerInput.value = appSettings.schedulePlanner;
+            document.documentElement.setAttribute('data-theme', appSettings.theme);
+        }
+
+        // --- Data Calculation & Update ---
+
+        function updateAllMetrics() {
+            const usdtPhpRate = parseFloat(usdtPhpRateInput.value);
+            const targetMonthlyIncomePhp = parseFloat(targetMonthlyIncomePhpInput.value);
+            const startingBalanceUsdt = parseFloat(startingBalanceUsdtInput.value);
+            const actualBalanceUsdt = parseFloat(actualCurrentBalanceUsdtInput.value);
+
+            if (isNaN(usdtPhpRate) || isNaN(targetMonthlyIncomePhp) || isNaN(startingBalanceUsdt) || isNaN(actualBalanceUsdt)) {
+                 console.warn("Invalid numerical input for financial goals or actual balance. Please check values and ensure they are numbers.");
+                 return;
+            }
+
+            // --- Calculate Cumulative Balance for Chart ---
+            cumulativeBalanceHistory = []; // Clear for recalculation
+            let runningBalance = startingBalanceUsdt;
+            if (tradeHistory.length > 0) {
+                // Add initial starting balance point for the chart
+                cumulativeBalanceHistory.push({ time: tradeHistory[0].time, balance: startingBalanceUsdt });
+                // Calculate running balance after each trade
+                tradeHistory.forEach(trade => {
+                    runningBalance += (trade.pnl || 0);
+                    cumulativeBalanceHistory.push({ time: trade.time, balance: runningBalance });
+                });
+            } else {
+                // If no trades, the cumulative balance is just the starting balance
+                cumulativeBalanceHistory.push({ time: new Date().toLocaleString('en-CA', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false }).replace(/,/, ''), balance: startingBalanceUsdt });
+            }
+
+            let totalPnLFromTrades = 0;
+            if (tradeHistory.length > 0) {
+                 totalPnLFromTrades = tradeHistory.reduce((sum, trade) => sum + (trade.pnl || 0), 0);
+            }
+            balanceData.calculatedBalanceUsdt = startingBalanceUsdt + totalPnLFromTrades;
+
+            if (tradeHistory.length >= 2) {
+                const pnlBeforeLastTrade = tradeHistory.slice(0, tradeHistory.length - 1).reduce((sum, trade) => sum + (trade.pnl || 0), 0);
+                balanceData.previousBalanceUsdt = startingBalanceUsdt + pnlBeforeLastTrade;
+            } else {
+                balanceData.previousBalanceUsdt = startingBalanceUsdt;
+            }
+
+            const lastTrade = tradeHistory.length > 0 ? tradeHistory[tradeHistory.length - 1] : null;
+            if (lastTrade) {
+                lastTradeStats.currentGainUsdt = lastTrade.pnl || 0;
+                lastTradeStats.currentRoi = lastTrade.roi || 0;
+                lastTradeStats.lastTradeAmount = lastTrade.effectiveVolume || 0;
+
+                if (tradeHistory.length >= 2) {
+                    lastTradeStats.previousGainUsdt = tradeHistory[tradeHistory.length - 2].pnl || 0;
+                    lastTradeStats.previousTradeAmount = tradeHistory[tradeHistory.length - 2].effectiveVolume || 0;
+                } else {
+                    lastTradeStats.previousGainUsdt = 0;
+                    lastTradeStats.previousTradeAmount = 0;
+                }
+            } else {
+                lastTradeStats = { ...DEFAULT_LAST_TRADE_STATS };
+            }
+
+            const totalGainsUsdt = balanceData.calculatedBalanceUsdt - startingBalanceUsdt;
+            const targetBalanceUsdt = startingBalanceUsdt + (targetMonthlyIncomePhp / usdtPhpRate);
+            const walletBalanceNeeded = targetBalanceUsdt - balanceData.calculatedBalanceUsdt;
+            const dailyTargetIncomeUsdt = (targetMonthlyIncomePhp / usdtPhpRate) / 30;
+            const remainingToTargetUsdt = Math.max(0, targetBalanceUsdt - balanceData.calculatedBalanceUsdt);
+            const daysRemaining = dailyTargetIncomeUsdt > 0 ? remainingToTargetUsdt / dailyTargetIncomeUsdt : Infinity;
+
+            targetBalanceUsdtEl.textContent = formatCurrency(targetBalanceUsdt);
+            targetBalancePhpEl.textContent = formatPhp(targetBalanceUsdt * usdtPhpRate);
+            totalGainsUsdtEl.textContent = formatCurrency(totalGainsUsdt);
+            totalGainsUsdtEl.classList.toggle('positive', totalGainsUsdt >= 0);
+            totalGainsUsdtEl.classList.toggle('negative', totalGainsUsdt < 0);
+            totalGainsPhpEl.textContent = formatPhp(totalGainsUsdt * usdtPhpRate);
+            totalGainsPhpEl.classList.toggle('positive', totalGainsUsdt >= 0);
+            totalGainsPhpEl.classList.toggle('negative', totalGainsUsdt < 0);
+
+            daysRemainingEl.textContent = isFinite(daysRemaining) ? daysRemaining.toFixed(2) + ' days' : 'N/A';
+            walletBalanceNeededEl.textContent = formatCurrency(walletBalanceNeeded);
+            walletBalanceNeededEl.classList.toggle('positive', walletBalanceNeeded <= 0);
+            walletBalanceNeededEl.classList.toggle('negative', walletBalanceNeeded > 0);
+
+            previousBalanceUsdtEl.textContent = formatCurrency(balanceData.previousBalanceUsdt);
+            previousBalancePhpEl.textContent = formatPhp(balanceData.previousBalanceUsdt * usdtPhpRate);
+            calculatedBalanceUsdtEl.textContent = formatCurrency(balanceData.calculatedBalanceUsdt);
+            calculatedBalancePhpEl.textContent = formatPhp(balanceData.calculatedBalanceUsdt * usdtPhpRate);
+
+            const discrepancyUsdt = actualBalanceUsdt - balanceData.calculatedBalanceUsdt;
+            discrepancyUsdtEl.textContent = formatCurrency(discrepancyUsdt);
+            discrepancyUsdtEl.classList.toggle('positive', discrepancyUsdt >= 0);
+            discrepancyUsdtEl.classList.toggle('negative', discrepancyUsdt < 0);
+            
+            discrepancyPhpEl.textContent = formatPhp(discrepancyUsdt * usdtPhpRate);
+            discrepancyPhpEl.classList.toggle('positive', discrepancyUsdt >= 0);
+            discrepancyPhpEl.classList.toggle('negative', discrepancyUsdt < 0);
+
+            balanceData.actualBalanceUsdt = actualBalanceUsdt;
+
+            // Record current discrepancy for charting if actual balance is provided
+            if (!isNaN(actualBalanceUsdt) && actualBalanceUsdt !== 0) {
+                const now = new Date();
+                const year = now.getFullYear();
+                const month = (now.getMonth() + 1).toString().padStart(2, '0');
+                const day = now.getDate().toString().padStart(2, '0');
+                const hours = now.getHours().toString().padStart(2, '0');
+                const minutes = now.getMinutes().toString().padStart(2, '0');
+                const seconds = now.getSeconds().toString().padStart(2, '0');
+                const currentTimeFormatted = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+
+                const lastDiscEntry = discrepancyHistory[discrepancyHistory.length - 1];
+                if (!lastDiscEntry || lastDiscEntry.value !== discrepancyUsdt || (new Date(currentTimeFormatted).getTime() - new Date(lastDiscEntry.time).getTime() > 60 * 1000) ) {
+                    discrepancyHistory.push({ time: currentTimeFormatted, value: discrepancyUsdt });
+                }
+            }
+
+
+            const currentGainUsdt = lastTradeStats.currentGainUsdt;
+            const currentGainPhp = currentGainUsdt * usdtPhpRate;
+            const previousGainUsdt = lastTradeStats.previousGainUsdt;
+            const gainDifferenceUsdt = currentGainUsdt - previousGainUsdt;
+            const gainDifferencePhp = gainDifferenceUsdt * usdtPhpRate;
+            const tradeAmountGrowth = lastTradeStats.lastTradeAmount - lastTradeStats.previousTradeAmount;
+
+            currentGainUsdtEl.textContent = formatCurrency(currentGainUsdt);
+            currentGainUsdtEl.classList.toggle('positive', currentGainUsdt >= 0);
+            currentGainUsdtEl.classList.toggle('negative', currentGainUsdt < 0);
+
+            currentGainPhpEl.textContent = formatPhp(currentGainPhp);
+            currentGainPhpEl.classList.toggle('positive', currentGainPhp >= 0);
+            currentGainPhpEl.classList.toggle('negative', currentGainPhp < 0);
+
+            currentRoiEl.textContent = formatPercentage(lastTradeStats.currentRoi);
+            currentRoiEl.classList.toggle('positive', lastTradeStats.currentRoi >= 0);
+            currentRoiEl.classList.toggle('negative', lastTradeStats.currentRoi < 0);
+
+            previousGainUsdtEl.textContent = formatCurrency(previousGainUsdt);
+            previousGainUsdtEl.classList.toggle('positive', previousGainUsdt >= 0);
+            previousGainUsdtEl.classList.toggle('negative', previousGainUsdt < 0);
+
+            gainDifferenceUsdtEl.textContent = formatCurrency(gainDifferenceUsdt);
+            gainDifferenceUsdtEl.classList.toggle('positive', gainDifferenceUsdt >= 0);
+            gainDifferenceUsdtEl.classList.toggle('negative', gainDifferenceUsdt < 0);
+
+            gainDifferencePhpEl.textContent = formatPhp(gainDifferencePhp);
+            gainDifferencePhpEl.classList.toggle('positive', gainDifferencePhp >= 0);
+            gainDifferencePhpEl.classList.toggle('negative', gainDifferencePhp < 0);
+
+            lastTradeAmountUsdtEl.textContent = formatCurrency(lastTradeStats.lastTradeAmount);
+            tradeAmountGrowthEl.textContent = formatCurrency(tradeAmountGrowth);
+            tradeAmountGrowthEl.classList.toggle('positive', tradeAmountGrowth >= 0);
+            tradeAmountGrowthEl.classList.toggle('negative', tradeAmountGrowth < 0);
+
+            let currentWin = 0;
+            let longestWin = 0;
+            let currentLoss = 0;
+            let longestLoss = 0;
+            let wins = 0;
+            let losses = 0;
+
+            tradeHistory.forEach(trade => {
+                if ((trade.pnl || 0) >= 0) {
+                    currentWin++;
+                    longestWin = Math.max(longestWin, currentWin);
+                    currentLoss = 0;
+                    wins++;
+                } else {
+                    currentLoss++;
+                    longestLoss = Math.max(longestLoss, currentLoss);
+                    currentWin = 0;
+                    losses++;
+                }
+            });
+
+            currentWinStreakEl.textContent = currentWin;
+            longestWinStreakEl.textContent = longestWin;
+            currentLossStreakEl.textContent = currentLoss;
+            longestLossStreakEl.textContent = longestLoss;
+            totalTradesEl.textContent = tradeHistory.length;
+            totalWinsEl.textContent = wins;
+            totalLossesEl.textContent = losses;
+            winRateEl.textContent = tradeHistory.length > 0 ? formatPercentage((wins / tradeHistory.length) * 100) : '0%';
+
+            updateCharts();
+            saveState();
+        }
+
+        // --- Chart Functions ---
+        function initializeCharts() {
+            const monthlyPnLChartCanvas = document.getElementById('monthlyPnLChart');
+            const monthlyVolumeChartCanvas = document.getElementById('monthlyVolumeChart');
+            const dailyRoiChartCanvas = document.getElementById('dailyRoiChart');
+            const dailyPnLChartCanvas = document.getElementById('dailyPnLChart');
+            const dailyVolumeChartCanvas = document.getElementById('dailyVolumeChart');
+            const discrepancyChartCanvas = document.getElementById('discrepancyChart');
+            const cumulativeBalanceChartCanvas = document.getElementById('cumulativeBalanceChart'); // New cumulative balance canvas
+
+            if (!monthlyPnLChartCanvas || !monthlyVolumeChartCanvas || !dailyRoiChartCanvas || !dailyPnLChartCanvas || !dailyVolumeChartCanvas || !discrepancyChartCanvas || !cumulativeBalanceChartCanvas) {
+                console.error("One or more chart canvas elements not found! Cannot initialize charts.");
+                return;
+            }
+
+            const ctxPnL = monthlyPnLChartCanvas.getContext('2d');
+            const ctxVolume = monthlyVolumeChartCanvas.getContext('2d');
+            const ctxRoi = dailyRoiChartCanvas.getContext('2d');
+            const ctxDailyPnL = dailyPnLChartCanvas.getContext('2d');
+            const ctxDailyVolume = dailyVolumeChartCanvas.getContext('2d');
+            const ctxDiscrepancy = discrepancyChartCanvas.getContext('2d');
+            const ctxCumulativeBalance = cumulativeBalanceChartCanvas.getContext('2d'); // New cumulative balance context
+
+            if (!ctxPnL || !ctxVolume || !ctxRoi || !ctxDailyPnL || !ctxDailyVolume || !ctxDiscrepancy || !ctxCumulativeBalance) {
+                 console.error("Could not get 2D context for one or more chart canvases!");
+                 return;
+            }
+
+            if (monthlyPnLChart) monthlyPnLChart.destroy();
+            if (monthlyVolumeChart) monthlyVolumeChart.destroy();
+            if (dailyRoiChart) dailyRoiChart.destroy();
+            if (dailyPnLChart) dailyPnLChart.destroy();
+            if (dailyVolumeChart) dailyVolumeChart.destroy();
+            if (discrepancyChart) discrepancyChart.destroy();
+            if (cumulativeBalanceChart) cumulativeBalanceChart.destroy(); // Destroy cumulative balance chart
+
+            monthlyPnLChart = new Chart(ctxPnL, {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: 'Monthly PNL (USDT)',
+                        data: [],
+                        borderColor: 'rgb(75, 192, 192)',
+                        tension: 0.1,
+                        fill: false
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'PNL (USDT)'
+                            },
+                            ticks: {
+                                callback: function(value) {
+                                    return value.toFixed(2) + ' USDT';
+                                }
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Month'
+                            }
+                        }
+                    },
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.dataset.label + ': ' + context.parsed.y.toFixed(2) + ' USDT';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            monthlyVolumeChart = new Chart(ctxVolume, {
+                type: 'bar',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: 'Monthly Trade Volume (USDT)',
+                        data: [],
+                        backgroundColor: function(context) {
+                            if (context.parsed && !isNaN(context.parsed.y) && context.parsed.y !== null) {
+                                return context.parsed.y >= 0 ? 'rgba(153, 102, 255, 0.6)' : 'rgba(255, 99, 132, 0.6)';
+                            }
+                            return 'rgba(153, 102, 255, 0.6)';
+                        },
+                        borderColor: function(context) {
+                            if (context.parsed && !isNaN(context.parsed.y) && context.parsed.y !== null) {
+                                return context.parsed.y >= 0 ? 'rgba(153, 102, 255, 1)' : 'rgba(255, 99, 132, 1)';
+                            }
+                            return 'rgba(153, 102, 255, 1)';
+                        },
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Volume (USDT)'
+                            },
+                            ticks: {
+                                callback: function(value) {
+                                    return value.toFixed(2) + ' USDT';
+                                }
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Month'
+                            }
+                        }
+                    },
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.dataset.label + ': ' + context.parsed.y.toFixed(2) + ' USDT';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            dailyRoiChart = new Chart(ctxRoi, {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: 'Daily ROI (%)',
+                        data: [],
+                        borderColor: 'rgb(255, 159, 64)',
+                        tension: 0.1,
+                        fill: false
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'ROI (%)'
+                            },
+                            ticks: {
+                                callback: function(value) {
+                                    return value.toFixed(2) + ' %';
+                                }
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Date'
+                            }
+                        }
+                    },
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.dataset.label + ': ' + context.parsed.y.toFixed(2) + ' %';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            dailyPnLChart = new Chart(ctxDailyPnL, {
+                type: 'bar',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: 'Daily PNL (USDT)',
+                        data: [],
+                        backgroundColor: function(context) {
+                            if (context.parsed && !isNaN(context.parsed.y) && context.parsed.y !== null) {
+                                return context.parsed.y >= 0 ? 'rgba(40, 167, 69, 0.7)' : 'rgba(220, 53, 69, 0.7)';
+                            }
+                            return 'rgba(40, 167, 69, 0.7)';
+                        },
+                        borderColor: function(context) {
+                            if (context.parsed && !isNaN(context.parsed.y) && context.parsed.y !== null) {
+                                return context.parsed.y >= 0 ? 'rgba(40, 167, 69, 1)' : 'rgba(220, 53, 69, 1)';
+                            }
+                            return 'rgba(40, 167, 69, 1)';
+                        },
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'PNL (USDT)'
+                            },
+                            ticks: {
+                                callback: function(value) {
+                                    return value.toFixed(2) + ' USDT';
+                                }
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Date'
+                            }
+                        }
+                    },
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.dataset.label + ': ' + context.parsed.y.toFixed(2) + ' USDT';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            dailyVolumeChart = new Chart(ctxDailyVolume, {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: 'Daily Trade Volume (USDT)',
+                        data: [],
+                        borderColor: 'rgb(54, 162, 235)',
+                        tension: 0.1,
+                        fill: false
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Volume (USDT)'
+                            },
+                            ticks: {
+                                callback: function(value) {
+                                    return value.toFixed(2) + ' USDT';
+                                }
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Date'
+                            }
+                        }
+                    },
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.dataset.label + ': ' + context.parsed.y.toFixed(2) + ' USDT';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            discrepancyChart = new Chart(ctxDiscrepancy, {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: 'Balance Discrepancy (USDT)',
+                        data: [],
+                        borderColor: 'rgb(255, 99, 132)',
+                        tension: 0.1,
+                        fill: false,
+                        pointBackgroundColor: function(context) {
+                            if (context.parsed && !isNaN(context.parsed.y) && context.parsed.y !== null) {
+                                return context.parsed.y >= 0 ? 'rgb(40, 167, 69)' : 'rgb(220, 53, 69)';
+                            }
+                            return 'rgb(200,200,200)';
+                        },
+                        pointBorderColor: 'white',
+                        pointBorderWidth: 1,
+                        pointRadius: 5,
+                        pointHoverRadius: 7
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: false,
+                            title: {
+                                display: true,
+                                text: 'Discrepancy (USDT)'
+                            },
+                            ticks: {
+                                callback: function(value) {
+                                    return value.toFixed(2) + ' USDT';
+                                }
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Time of Update'
+                            }
+                        }
+                    },
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.dataset.label + ': ' + context.parsed.y.toFixed(2) + ' USDT';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            // NEW: Cumulative Balance Chart
+            cumulativeBalanceChart = new Chart(ctxCumulativeBalance, {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: 'Cumulative Balance (USDT)',
+                        data: [],
+                        borderColor: 'rgb(75, 192, 192)', // Same as PNL, but can be changed
+                        tension: 0.1,
+                        fill: true, // Fill area under the curve
+                        backgroundColor: 'rgba(75, 192, 192, 0.2)' // Light fill
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: false, // Balance might not start at zero
+                            title: {
+                                display: true,
+                                text: 'Balance (USDT)'
+                            },
+                            ticks: {
+                                callback: function(value) {
+                                    return value.toFixed(2) + ' USDT';
+                                }
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Time'
+                            }
+                        }
+                    },
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.dataset.label + ': ' + context.parsed.y.toFixed(2) + ' USDT';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateCharts() {
+            const monthlyData = {};
+            const dailyData = {};
+
+            tradeHistory.forEach(trade => {
+                const tradeDate = new Date(trade.time);
+                if (trade.time && !isNaN(tradeDate.getTime())) {
+                    // Monthly data calculation
+                    const yearMonth = `${tradeDate.getFullYear()}-${(tradeDate.getMonth() + 1).toString().padStart(2, '0')}`;
+                    if (!monthlyData[yearMonth]) {
+                        monthlyData[yearMonth] = { pnl: 0, volume: 0 };
+                    }
+                    monthlyData[yearMonth].pnl += (trade.pnl || 0);
+                    monthlyData[yearMonth].volume += (trade.effectiveVolume || 0);
+
+                    // Daily data calculation (for PNL, Volume, and ROI)
+                    const fullDate = `${tradeDate.getFullYear()}-${(tradeDate.getMonth() + 1).toString().padStart(2, '0')}-${tradeDate.getDate().toString().padStart(2, '0')}`;
+                    if (!dailyData[fullDate]) {
+                        dailyData[fullDate] = { pnl: 0, volume: 0, roiSum: 0, roiCount: 0 };
+                    }
+                    dailyData[fullDate].pnl += (trade.pnl || 0);
+                    dailyData[fullDate].volume += (trade.effectiveVolume || 0);
+                    dailyData[fullDate].roiSum += (trade.roi || 0);
+                    dailyData[fullDate].roiCount++;
+                } else {
+                    console.warn("Skipping trade for chart data due to invalid time or malformed date:", trade);
+                }
+            });
+
+            const sortedMonths = Object.keys(monthlyData).sort();
+            const monthlyPnLValues = sortedMonths.map(month => monthlyData[month].pnl);
+            const monthlyVolumeValues = sortedMonths.map(month => monthlyData[month].volume);
+
+            if (monthlyPnLChart) {
+                monthlyPnLChart.data.labels = sortedMonths;
+                monthlyPnLChart.data.datasets[0].data = monthlyPnLValues;
+                monthlyPnLChart.update();
+            } else {
+                console.warn("Monthly PnL Chart not ready for update.");
+            }
+
+            if (monthlyVolumeChart) {
+                monthlyVolumeChart.data.labels = sortedMonths;
+                monthlyVolumeChart.data.datasets[0].data = monthlyVolumeValues;
+                monthlyVolumeChart.update();
+            } else {
+                console.warn("Monthly Volume Chart not ready for update.");
+            }
+
+            const sortedDates = Object.keys(dailyData).sort();
+            const dailyRoiValues = sortedDates.map(date => {
+                const data = dailyData[date];
+                return data.roiCount > 0 ? data.roiSum / data.roiCount : 0;
+            });
+            const dailyPnLValues = sortedDates.map(date => dailyData[date].pnl);
+            const dailyVolumeValues = sortedDates.map(date => dailyData[date].volume);
+
+
+            if (dailyRoiChart) {
+                dailyRoiChart.data.labels = sortedDates;
+                dailyRoiChart.data.datasets[0].data = dailyRoiValues;
+                dailyRoiChart.update();
+            } else {
+                console.warn("Daily ROI Chart not ready for update.");
+            }
+
+            if (dailyPnLChart) {
+                dailyPnLChart.data.labels = sortedDates;
+                dailyPnLChart.data.datasets[0].data = dailyPnLValues;
+                dailyPnLChart.update();
+            } else {
+                console.warn("Daily PNL Chart not ready for update.");
+            }
+
+            if (dailyVolumeChart) {
+                dailyVolumeChart.data.labels = sortedDates;
+                dailyVolumeChart.data.datasets[0].data = dailyVolumeValues;
+                dailyVolumeChart.update();
+            } else {
+                console.warn("Daily Volume Chart not ready for update.");
+            }
+
+            // Update Discrepancy Chart
+            const discrepancyLabels = discrepancyHistory.map(entry => entry.time);
+            const discrepancyChartValues = discrepancyHistory.map(entry => entry.value);
+            
+            if (discrepancyChart) {
+                discrepancyChart.data.labels = discrepancyLabels;
+                discrepancyChart.data.datasets[0].data = discrepancyChartValues;
+                discrepancyChart.update();
+            } else {
+                console.warn("Discrepancy Chart not ready for update.");
+            }
+
+            // Update Cumulative Balance Chart (NEW)
+            const cumulativeLabels = cumulativeBalanceHistory.map(entry => entry.time);
+            const cumulativeValues = cumulativeBalanceHistory.map(entry => entry.balance);
+
+            if (cumulativeBalanceChart) {
+                cumulativeBalanceChart.data.labels = cumulativeLabels;
+                cumulativeBalanceChart.data.datasets[0].data = cumulativeValues;
+                cumulativeBalanceChart.update();
+            } else {
+                console.warn("Cumulative Balance Chart not ready for update.");
+            }
+        }
+
+        // --- Data Parsing ---
+        function displayTrades(trades) {
+            tradeHistoryOutput.innerHTML = '';
+            if (trades.length === 0) {
+                tradeHistoryOutput.innerHTML = '<p>No trade data processed yet.</p>';
+                return;
+            }
+
+            [...trades].reverse().forEach((trade) => {
+                const tradeDiv = document.createElement('div');
+                tradeDiv.classList.add('trade-entry');
+                tradeDiv.innerHTML = `
+                    <div class="card-row"><strong>Pair:</strong><span>${trade.pair || 'N/A'}</span></div>
+                    <div class="card-row"><strong>Order No.:</strong><span>${trade.orderNo || 'N/A'}</span></div>
+                    <div class="card-row"><strong>Time:</strong><span>${trade.time || 'N/A'}</span></div>
+                    <div class="card-row"><strong>PNL:</strong><span class="${(trade.pnl || 0) >= 0 ? 'positive' : 'negative'}">${formatCurrency(trade.pnl || 0)}</span></div>
+                    <div class="card-row"><strong>ROI:</strong><span class="${(trade.pnl || 0) >= 0 ? 'positive' : 'negative'}">${formatPercentage(trade.roi || 0)}</span></div>
+                    <div class="card-row"><strong>Amount:</strong><span>${formatCurrency(trade.amount || 0)}</span></div>
+                    <div class="card-row"><strong>Effective Vol:</strong><span>${formatCurrency(trade.effectiveVolume || 0)}</span></div>
+                `;
+                tradeHistoryOutput.appendChild(tradeDiv);
+            });
+        }
+
+
+        // Parser for DETAILED trade blocks (BTC/USDT, PNL, ROI, etc.)
+        function parseTradeData(rawData) {
+            rawData = rawData.trim();
+            rawData = rawData.replace(/[\u00A0\u200B-\u200D\uFEFF]/g, ' ');
+            rawData = rawData.replace(/\r\n|\r/g, '\n');
+
+            const patterns = {
+                pair: /^([A-Z]{2,5}\/[A-Z]{2,5})$/,
+                orderId: /^NO\.\s*(\d+)$/,
+                orderNo: /^Order No\.\s*(\d+)$/,
+                time: /^Time\s*(\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2})$/,
+                openingTime: /^Opening Time\s*(\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2})$/,
+                settlementTime: /^Settlement Time\s*(\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2})$/,
+                amount: /^Amount\s*([\d.]+)\s*USDT$/,
+                side: /^Side\s*(.*)$/,
+                result: /^Result\s*(.*)$/,
+                openPrice: /^Open Price\s*\(USDT\)\s*([\d.,]+)$/,
+                closePrice: /^Close Price\s*\(USDT\)\s*([\d.,]+)$/,
+                pnl: /^PNL\s*([+-]?[\d.]+)\s*USDT$/,
+                roi: /^ROI\s*≈?\s*([\d.]+)\s*%$/,
+                odd: /^Odd\s*([\d.]+)\s*%$/,
+                effectiveVolume: /^Effective trading volume\s*([\d.]+)\s*USDT$/
+            };
+
+            const tradeBlocks = [];
+            const lines = rawData.split('\n').map(line => cleanLine(line));
+
+            let currentTradeBlockLines = [];
+            let inTradeBlock = false;
+
+            lines.forEach(line => {
+                if (patterns.pair.test(line)) {
+                    if (inTradeBlock && currentTradeBlockLines.length > 0) {
+                        tradeBlocks.push(currentTradeBlockLines.join('\n'));
+                    }
+                    currentTradeBlockLines = [line];
+                    inTradeBlock = true;
+                } else if (inTradeBlock) {
+                    if (line.length > 0) {
+                        currentTradeBlockLines.push(line);
+                    }
+                }
+            });
+
+            if (inTradeBlock && currentTradeBlockLines.length > 0) {
+                tradeBlocks.push(currentTradeBlockLines.join('\n'));
+            }
+
+            const parsedTrades = [];
+
+            tradeBlocks.forEach(block => {
+                const trade = { type: 'Detailed Trade' };
+                const blockLines = block.split('\n').filter(line => line.length > 0);
+
+                blockLines.forEach(line => {
+                    let match;
+                    if ((match = line.match(patterns.pair))) { trade.pair = match[1]; }
+                    else if ((match = line.match(patterns.orderId))) { trade.orderId = match[1]; }
+                    else if ((match = line.match(patterns.orderNo))) { trade.orderNo = match[1]; }
+                    else if ((match = line.match(patterns.time))) { trade.time = match[1]; }
+                    else if ((match = line.match(patterns.openingTime))) { trade.openingTime = match[1]; }
+                    else if ((match = line.match(patterns.settlementTime))) { trade.settlementTime = match[1]; }
+                    else if ((match = line.match(patterns.amount))) { trade.amount = parseFloat(match[1].replace(/,/g, '')); }
+                    else if ((match = line.match(patterns.side))) { if (match[1].trim() !== '') trade.side = match[1].trim(); }
+                    else if ((match = line.match(patterns.result))) { if (match[1].trim() !== '') trade.result = match[1].trim(); }
+                    else if ((match = line.match(patterns.openPrice))) { trade.openPrice = parseFloat(match[1].replace(/,/g, '')); }
+                    else if ((match = line.match(patterns.closePrice))) { trade.closePrice = parseFloat(match[1].replace(/,/g, '')); }
+                    else if ((match = line.match(patterns.pnl))) { trade.pnl = parseFloat(match[1].replace(/,/g, '')); }
+                    else if ((match = line.match(patterns.roi))) { trade.roi = parseFloat(match[1].replace(/,/g, '')); }
+                    else if ((match = line.match(patterns.odd))) { trade.odd = parseFloat(match[1].replace(/,/g, '')); }
+                    else if ((match = line.match(patterns.effectiveVolume))) { trade.effectiveVolume = parseFloat(match[1].replace(/,/g, '')); }
+                });
+
+                if (trade.pair && trade.time && !isNaN(new Date(trade.time).getTime()) && !isNaN(trade.pnl)) {
+                    parsedTrades.push(trade);
+                } else {
+                    console.warn("Skipping malformed or incomplete detailed trade block:", block, "\nParsed data so far:", trade);
+                }
+            });
+
+            return parsedTrades;
+        }
+
+
+        // --- Event Listeners ---
+
+        usdtPhpRateInput.addEventListener('input', () => {
+            appSettings.usdtPhpRate = parseFloat(usdtPhpRateInput.value) || 0;
+            updateAllMetrics();
+        });
+        targetMonthlyIncomePhpInput.addEventListener('input', () => {
+            appSettings.targetMonthlyIncomePhp = parseFloat(targetMonthlyIncomePhpInput.value) || 0;
+            updateAllMetrics();
+        });
+        startingBalanceUsdtInput.addEventListener('input', () => {
+            appSettings.startingBalanceUsdt = parseFloat(startingBalanceUsdtInput.value) || 0;
+            updateAllMetrics();
+        });
+        actualCurrentBalanceUsdtInput.addEventListener('input', () => {
+            balanceData.actualBalanceUsdt = parseFloat(actualCurrentBalanceUsdtInput.value) || 0;
+            updateAllMetrics();
+        });
+        schedulePlannerInput.addEventListener('input', () => {
+            appSettings.schedulePlanner = schedulePlannerInput.value;
+            saveState();
+        });
+
+        processDataButton.addEventListener('click', () => {
+            console.log("Process Detailed Trades button clicked.");
+            const rawData = tradeDataInput.value;
+            if (rawData.trim().length > 0) {
+                const newTrades = parseTradeData(rawData);
+                console.log("Parsed detailed trades:", newTrades);
+                handleNewParsedTrades(newTrades);
+            } else {
+                alert('Please paste your detailed trade data into the text area before clicking Process Detailed Trades.');
+            }
+        });
+
+
+        function handleNewParsedTrades(tradesOrTransactions) {
+            if (tradesOrTransactions.length > 0) {
+                const existingTradeIdentifiers = new Set(tradeHistory.map(t => t.orderNo));
+                
+                const entriesToAdd = tradesOrTransactions.filter(entry => {
+                    if (entry.orderNo && existingTradeIdentifiers.has(entry.orderNo)) {
+                        console.log("Skipping duplicate detailed trade (Order No.):", entry.orderNo);
+                        return false;
+                    }
+                    if (!entry.time || isNaN(new Date(entry.time).getTime())) {
+                        console.warn("Invalid or missing time for new entry, skipping:", entry);
+                        return false;
+                    }
+                    return true;
+                });
+
+                if(entriesToAdd.length > 0) {
+                    const lastPnLEntry = entriesToAdd.filter(e => e.pnl !== 0).pop();
+                    if (lastPnLEntry) {
+                        if (lastPnLEntry.pnl > 0) {
+                            playSound('win');
+                        } else if (lastPnLEntry.pnl < 0) {
+                            playSound('loss');
+                        }
+                    }
+
+                    tradeHistory.push(...entriesToAdd);
+                    tradeHistory.sort((a, b) => new Date(a.time).getTime() - new Date(b.time).getTime());
+                    
+                    tradeDataInput.value = '';
+                    
+                    displayTrades(tradeHistory);
+                    updateAllMetrics();
+                } else {
+                    alert("No new or unique entries found to add from the pasted data. Check if entries are duplicates or malformed.");
+                }
+            } else {
+                alert('Could not parse any valid entries from the input. Please check the format carefully. Look at the browser console (F12) for more detailed warnings.');
+            }
+        }
+
+
+        themeToggleButton.addEventListener('click', () => {
+            console.log("Theme toggle clicked.");
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', newTheme);
+            appSettings.theme = newTheme;
+            saveState();
+        });
+
+        resetDataButtonBottom.addEventListener('click', () => {
+            if (confirm("Are you sure you want to reset ALL your saved data? This action cannot be undone.")) {
+                tradeHistory = [];
+                appSettings = { ...DEFAULT_APP_SETTINGS };
+                balanceData = { ...DEFAULT_BALANCE_DATA };
+                lastTradeStats = { ...DEFAULT_LAST_TRADE_STATS };
+                discrepancyHistory = [];
+                cumulativeBalanceHistory = []; // Reset cumulative balance history too!
+
+                localStorage.clear();
+                localStorage.setItem('hasSeenSetup', 'false'); // Reset setup flag
+
+                loadState();
+                displayTrades(tradeHistory);
+                updateAllMetrics();
+                showSetupModal();
+
+                alert("All data has been reset.");
+                console.log("All data reset successfully.");
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log("DOM fully loaded and parsed. Current time:", new Date().toLocaleString());
+            loadState();
+            initializeCharts();
+            updateAllMetrics();
+            displayTrades(tradeHistory);
+
+            const hasSeenSetup = localStorage.getItem('hasSeenSetup');
+            if (hasSeenSetup === null || hasSeenSetup === 'false') {
+                currentSetupStep = 0;
+                showSetupModal();
+            }
+        });
+    </script>
+</body>
+</html>
