@@ -1,0 +1,325 @@
+:root {
+    --background-color: #f4f7f6;
+    --text-color: #333;
+    --text-color-muted: #666;
+    --card-background: #ffffff;
+    --border-color: #e0e0e0;
+    --header-background: #007bff;
+    --header-text: #ffffff;
+    --positive-color: #28a745;
+    --negative-color: #dc3545;
+    --button-background: #007bff;
+    --button-text: #ffffff;
+    --input-background: #fdfdfd;
+    --input-border: #ccc;
+    --accent-color: #007bff;
+    --accent-color-light: rgba(0, 123, 255, 0.2);
+    --shadow-color: rgba(0, 0, 0, 0.1);
+}
+
+[data-theme="dark"] {
+    --background-color: #2c2c2c;
+    --text-color: #f0f0f0;
+    --text-color-muted: #aaa;
+    --card-background: #3a3a3a;
+    --border-color: #444;
+    --header-background: #1e88e5;
+    --header-text: #f0f0f0;
+    --positive-color: #4CAF50;
+    --negative-color: #f44336;
+    --button-background: #1e88e5;
+    --button-text: #f0f0f0;
+    --input-background: #4a4a4a;
+    --input-border: #666;
+    --accent-color: #1e88e5;
+    --accent-color-light: rgba(30, 136, 229, 0.25);
+    --shadow-color: rgba(0, 0, 0, 0.3);
+}
+
+body {
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    margin: 0;
+    padding: 20px;
+    background-color: var(--background-color);
+    color: var(--text-color);
+    transition: background-color 0.3s ease, color 0.3s ease;
+    line-height: 1.6;
+}
+
+.container {
+    max-width: 1400px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+    gap: 20px;
+}
+
+/* --- HEADER --- */
+header {
+    grid-column: 1 / -1;
+    background-color: var(--header-background);
+    color: var(--header-text);
+    padding: 20px 30px;
+    border-radius: 12px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 10px var(--shadow-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+header h1 {
+    margin: 0;
+    font-size: 2em;
+}
+
+.theme-toggle-button {
+    background: none;
+    border: 2px solid var(--header-text);
+    color: var(--header-text);
+    padding: 8px 15px;
+    border-radius: 25px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.theme-toggle-button:hover {
+    background-color: var(--header-text);
+    color: var(--header-background);
+}
+
+/* --- CARD STYLES --- */
+.card {
+    background-color: var(--card-background);
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 4px 8px var(--shadow-color);
+    display: flex;
+    flex-direction: column;
+}
+
+.card h2, .card h3 {
+    margin-top: 0;
+    color: var(--accent-color);
+    font-size: 1.5em;
+    border-bottom: 2px solid var(--border-color);
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+    cursor: grab; /* Visual cue for dragging */
+}
+.card h2:active, .card h3:active {
+    cursor: grabbing;
+}
+
+
+/* Groups within cards (e.g., Core Inputs, Projections) */
+.card-group {
+    padding-top: 15px;
+    border-top: 1px solid var(--border-color);
+}
+.card-group:first-child {
+    padding-top: 0;
+    border-top: none;
+}
+
+.card-group h4 {
+    margin: 0 0 15px 0;
+    font-size: 0.9em;
+    font-weight: 600;
+    color: var(--text-color-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.card-group-subsection h5 {
+    margin: 10px 0;
+    font-size: 1em;
+    font-weight: 600;
+}
+
+.card-content {
+    display: flex;
+    flex-direction: column;
+    gap: 18px; /* Increased gap for better spacing */
+}
+
+/* --- PERFECT ALIGNMENT FOR ROWS --- */
+.card-row {
+    display: grid;
+    grid-template-columns: 1fr auto; /* Label takes space, value/input is auto-width */
+    gap: 15px;
+    align-items: center;
+}
+
+.card-row span:first-child, .card-row strong {
+    font-weight: 500;
+    color: var(--text-color);
+}
+
+.value {
+    font-weight: 600;
+    font-size: 1.1em;
+    text-align: right;
+}
+
+.positive { color: var(--positive-color); }
+.negative { color: var(--negative-color); }
+
+
+/* --- INPUTS & BUTTONS --- */
+input[type="number"], textarea, button {
+    font-size: 1em;
+    border-radius: 8px;
+    border: 1px solid var(--input-border);
+    background-color: var(--input-background);
+    color: var(--text-color);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    padding: 10px;
+    box-sizing: border-box;
+    width: 100%;
+}
+
+input[type="number"]:focus, textarea:focus {
+    outline: none;
+    border-color: var(--accent-color);
+    box-shadow: 0 0 0 3px var(--accent-color-light);
+}
+
+/* Ensure inputs in rows align correctly */
+.card-row input[type="number"] {
+    text-align: right;
+    font-weight: 600;
+    font-size: 1.1em;
+    max-width: 180px; /* Give inputs a consistent max width */
+    justify-self: end; /* Align the input itself to the right of the grid cell */
+}
+
+/* Radio Button Styling */
+.projection-method-selection {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+.projection-method-selection label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+}
+.projection-method-selection input[type="radio"] {
+    width: auto;
+    accent-color: var(--accent-color);
+}
+
+button {
+    border: none;
+    background-color: var(--button-background);
+    color: var(--button-text);
+    cursor: pointer;
+    margin-top: 10px;
+    font-weight: 600;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+}
+button:hover {
+    background-color: var(--accent-color);
+    transform: translateY(-2px);
+}
+button:active { transform: translateY(0); }
+
+
+/* --- CHART & HISTORY STYLES --- */
+.chart-container {
+    position: relative;
+    height: 300px;
+    width: 100%;
+    margin-top: 15px;
+}
+
+#tradeHistoryOutput {
+    max-height: 400px;
+    overflow-y: auto;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 15px;
+    background-color: var(--background-color);
+}
+
+.trade-entry {
+    border-bottom: 1px dashed var(--border-color);
+    padding: 10px 0;
+}
+.trade-entry:last-child {
+    border-bottom: none;
+}
+
+/* --- OTHER & RESPONSIVE --- */
+.reset-button-bottom-container {
+    grid-column: 1 / -1; /* Span full width */
+    text-align: center;
+    margin-top: 20px;
+    padding: 10px;
+}
+.reset-button-bottom {
+    background-color: var(--negative-color);
+    max-width: 300px;
+    margin: 0 auto; /* Center the button */
+}
+.reset-button-bottom:hover {
+    background-color: #c82333;
+}
+
+
+/* --- MOBILE OPTIMIZATION --- */
+@media (max-width: 768px) {
+    .container { grid-template-columns: 1fr; }
+    header { flex-direction: column; align-items: flex-start; gap: 15px; }
+    .card-row { grid-template-columns: 1fr; } /* Stack rows vertically */
+    .card-row .value, .card-row input[type="number"] {
+        text-align: left;
+        max-width: none;
+        justify-self: start;
+    }
+}
+
+/* Modal styles remain the same */
+.setup-modal-overlay {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background-color: rgba(0, 0, 0, 0.85); display: flex;
+    justify-content: center; align-items: center; z-index: 1000;
+    opacity: 0; visibility: hidden; transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+.setup-modal-overlay.visible { opacity: 1; visibility: visible; }
+.setup-modal-content {
+    background-color: var(--card-background); color: var(--text-color);
+    padding: 30px; border-radius: 12px; max-width: 600px; width: 90%;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3); text-align: center;
+    transform: translateY(20px); transition: transform 0.3s ease;
+}
+.setup-modal-overlay.visible .setup-modal-content { transform: translateY(0); }
+.setup-modal-content h2 {
+    color: var(--accent-color); margin-top: 0; font-size: 2em;
+    border-bottom: 2px solid var(--border-color); padding-bottom: 10px; margin-bottom: 20px;
+}
+.setup-modal-content p { font-size: 1.1em; margin-bottom: 15px; text-align: left; }
+.setup-modal-content ol, .setup-modal-content ul {
+    text-align: left; margin-bottom: 15px; padding-left: 20px;
+}
+.setup-modal-content li { margin-bottom: 8px; }
+.setup-modal-navigation {
+    margin-top: 25px; display: flex; justify-content: space-between; gap: 10px;
+}
+.setup-modal-navigation button {
+    flex: 1; padding: 12px 20px; border-radius: 8px; border: none;
+    background-color: var(--button-background); color: var(--button-text);
+    font-weight: bold; cursor: pointer; transition: background-color 0.2s ease, transform 0.1s ease;
+}
+.setup-modal-navigation button:hover {
+    background-color: var(--accent-color); transform: translateY(-2px);
+}
+.setup-modal-navigation button:disabled {
+    background-color: var(--input-border); cursor: not-allowed; transform: translateY(0);
+}
+.setup-modal-navigation .start-tracking-button { background-color: var(--positive-color); }
+.setup-modal-navigation .start-tracking-button:hover { background-color: #218838; }
+.setup-modal-progress { margin-top: 15px; font-size: 0.9em; color: #777; }
