@@ -66,13 +66,32 @@
         
         /* Shepherd.js tour styling */
         .shepherd-element {
-            max-width: 400px;
+            max-width: 175px; /* User requested width */
+        }
+        .shepherd-has-title .shepherd-content .shepherd-header {
+            background: #e6e6e6;
+            padding: 9px;
+        }
+        .shepherd-footer {
+            border-bottom-left-radius: 5px;
+            border-bottom-right-radius: 5px;
+            display: flex;
+            justify-content: flex-end;
+            padding: 0 9px 9px;
+        }
+        .shepherd-title {
+            font-size: 11px !important;
+            font-weight: bold !important;
+        }
+        .shepherd-text {
+            font-size: 10px !important; /* User requested font size */
         }
         .shepherd-button {
             background: var(--bs-primary);
             color: white;
             border: none;
-            padding: 0.5rem 1rem;
+            padding: 0.25rem 0.5rem; /* Smaller padding */
+            font-size: 10px;        /* Smaller font size */
             border-radius: 0.25rem;
             margin-right: 0.5rem;
         }
@@ -81,6 +100,11 @@
         }
         .shepherd-button.shepherd-button-secondary {
             background: var(--bs-secondary);
+        }
+        
+        /* Card title padding adjustment */
+        .card h2, .card h3 {
+            padding-bottom: 8px; /* Reduced from 10px */
         }
     </style>
 </head>
