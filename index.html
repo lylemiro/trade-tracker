@@ -1,360 +1,722 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-bs-theme="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Trade Progress Tracker</title>
-    <link rel="stylesheet" href="style.css">
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" xintegrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    
+    <!-- External Libraries: Chart.js for charts and Sortable.js for draggable cards -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+
+    <style>
+        /* Custom styles to complement Bootstrap */
+        :root {
+            --bs-body-font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            --positive-color: #198754;
+            --negative-color: #dc3545;
+        }
+
+        [data-bs-theme="dark"] {
+            --positive-color: #20c997;
+            --negative-color: #fd7e14;
+        }
+
+        .positive { color: var(--positive-color) !important; }
+        .negative { color: var(--negative-color) !important; }
+
+        .card-header {
+            cursor: grab;
+        }
+        .card-header:active {
+            cursor: grabbing;
+        }
+        
+        /* Collapse icon transition */
+        .collapse-icon {
+            transition: transform 0.3s ease;
+        }
+        [aria-expanded="false"] .collapse-icon {
+            transform: rotate(-90deg);
+        }
+
+        .chart-container {
+            position: relative;
+            height: 300px;
+            width: 100%;
+        }
+
+        #tradeHistoryOutput {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .trade-entry:not(:last-child) {
+            border-bottom: 1px dashed var(--bs-border-color);
+            padding-bottom: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+    </style>
 </head>
 <body>
-    <header>
-        <h1>Trade Progress Dashboard</h1>
-        <div class="header-buttons">
-            <button class="theme-toggle-button" id="themeToggle">Toggle Theme</button>
-        </div>
-    </header>
-
-    <div class="container">
-
-        <div class="card trade-data-card">
-            <h2>Input Detailed Trade History</h2>
-            <textarea id="tradeDataInput" rows="15" placeholder="
-Instructions for pasting DETAILED trade history:
-
-1.  **Copy all your detailed trade records directly.**
-2.  **Each trade block MUST start with a crypto pair (e.g., 'BTC/USDT').**
-3.  **Each piece of data (label and value) should be on a single line, separated by a single space.**
-    * Example: `Time 2025-07-22 19:04`
-    * Example: `PNL +2.36 USDT`
-    * Example: `Order No. 579579592027456`
-4.  Blank lines between trade blocks are fine.
-5.  Lines that don't match expected patterns (like empty 'Side'/'Result' labels) will be ignored.
-
-**Example of the expected format:**
-
-BTC/USDT
-NO. 25068412
-Order No. 579579592027456
-Time 2025-07-22 19:04
-Opening Time 2025-07-22 19:15
-Settlement Time 2025-07-22 19:20
-Amount 3.19 USDT
-Open Price (USDT) 118,913.38
-Close Price (USDT) 118,913.49
-PNL +2.36 USDT
-ROI ≈ 73.98 %
-Odd 74.16 %
-Effective trading volume 3.19 USDT
-
-(Continue pasting more detailed trade blocks separated by a blank line)"
-></textarea>
-            <button id="processDataButton">Process Detailed Trades</button>
-        </div>
-
-        <div class="card">
-            <h2>Balance Overview</h2>
-            <div class="card-content">
-                <div class="card-row">
-                    <span>Previous Balance:</span>
-                    <span id="previousBalanceCombined" class="value"></span>
-                </div>
-                <div class="card-row">
-                    <span>Calculated Balance:</span>
-                    <span id="calculatedBalanceCombined" class="value"></span>
-                </div>
-                <hr style="width:100%; border:0; border-top:1px solid var(--border-color); margin: 10px 0;">
-                <div class="card-row">
-                    <span>Actual Current Balance (USDT):</span>
-                    <input type="number" id="actualCurrentBalanceUsdtInput" value="0" step="0.01">
-                </div>
-                <div class="card-row">
-                    <span><strong>Discrepancy:</strong></span>
-                    <span id="discrepancyCombined" class="value"></span>
-                </div>
-                <p style="font-size: 0.8em; color: var(--text-color-muted);">Discrepancy = Actual - Calculated. Positive means extra funds (deposits, bonuses, errors). Negative means missing funds (withdrawals, fees, unlogged losses).</p>
+    <!-- --- HTML STRUCTURE (Bootstrap) --- -->
+    <div class="container-fluid p-3 p-lg-4">
+        <header class="p-3 mb-4 rounded-3 text-bg-primary shadow-sm">
+            <div class="d-flex justify-content-between align-items-center">
+                <h1 class="h3 mb-0">Trade Progress Dashboard</h1>
+                <button class="btn btn-outline-light rounded-pill" id="themeToggle">
+                    <i class="bi bi-moon-stars-fill"></i> Toggle Theme
+                </button>
             </div>
-        </div>
+        </header>
 
-        <div class="card">
-            <h2>Gains Summary</h2>
-            <div class="card-content">
-                <div class="card-row">
-                    <span>Current Gain (USDT):</span>
-                    <span id="currentGainUsdt" class="value"></span>
-                </div>
-                <div class="card-row">
-                    <span>Current Gain (₱):</span>
-                    <span id="currentGainPhp" class="value"></span>
-                </div>
-                <div class="card-row">
-                    <span>Current ROI:</span>
-                    <span id="currentRoi" class="value"></span>
-                </div>
-                <div class="card-row">
-                    <span>Previous Gain (USDT):</span>
-                    <span id="previousGainUsdt" class="value"></span>
-                </div>
-                <div class="card-row">
-                    <span>Gain Difference (USDT):</span>
-                    <span id="gainDifferenceUsdt" class="value"></span>
-                </div>
-                <div class="card-row">
-                    <span>Gain Difference (₱):</span>
-                    <span id="gainDifferencePhp" class="value"></span>
-                </div>
-                <div class="card-row">
-                    <span>Last Trade Amount (USDT):</span>
-                    <span id="lastTradeAmountUsdt" class="value"></span>
-                </div>
-                <div class="card-row">
-                    <span>Trade Amount Growth:</span>
-                    <span id="tradeAmountGrowth" class="value"></span>
-                </div>
-            </div>
-        </div>
-
-        <div class="card trade-data-card" id="processedHistoryCard">
-            <h3>Processed Trade History</h3>
-            <div id="tradeHistoryOutput">
-                <p>No trade data processed yet.</p>
-            </div>
-        </div>
-
-        <div class="card chart-card">
-            <h2>Daily PNL Progress</h2>
-            <div class="chart-container">
-                <canvas id="dailyPnLChart"></canvas>
-            </div>
-        </div>
-
-        <div class="card chart-card">
-            <h2>Cumulative Balance Progress</h2>
-            <div class="chart-container">
-                <canvas id="cumulativeBalanceChart"></canvas>
-            </div>
-        </div>
-
-        <div class="card chart-card">
-            <h2>Daily ROI Progress</h2>
-            <div class="chart-container">
-                <canvas id="dailyRoiChart"></canvas>
-            </div>
-        </div>
-
-        <div class="card chart-card">
-            <h2>Projected Compounding Growth</h2>
-            <div class="chart-container">
-                <canvas id="projectedGrowthChart"></canvas>
-            </div>
-        </div>
-        
-        <div class="card">
-            <h2>Streak Analytics</h2>
-            <div class="card-content">
-                <div class="card-row">
-                    <span><strong>Current Win Streak:</strong></span>
-                    <span id="currentWinStreak" class="value positive">0</span>
-                </div>
-                <div class="card-row">
-                    <span><strong>Longest Win Streak:</strong></span>
-                    <span id="longestWinStreak" class="value positive">0</span>
-                </div>
-                <div class="card-row">
-                    <span><strong>Current Loss Streak:</strong></span>
-                    <span id="currentLossStreak" class="value negative">0</span>
-                </div>
-                <div class="card-row">
-                    <span><strong>Longest Loss Streak:</strong></span>
-                    <span id="longestLossStreak" class="value negative">0</span>
-                </div>
-                <div class="card-row">
-                    <span><strong>Total Trades:</strong></span>
-                    <span id="totalTrades" class="value">0</span>
-                </div>
-                <div class="card-row">
-                    <span><strong>Total Wins:</strong></span>
-                    <span id="totalWins" class="value positive">0</span>
-                </div>
-                <div class="card-row">
-                    <span><strong>Total Losses:</strong></span>
-                    <span id="totalLosses" class="value negative">0</span>
-                </div>
-                <div class="card-row">
-                    <span><strong>Win Rate:</strong></span>
-                    <span id="winRate" class="value">0%</span>
-                </div>
-            </div>
-        </div>
-        
-        <div class="card" id="calculatedGoalsCard">
-            <h2>Calculated Goals</h2>
-            <div class="card-content">
-                <div class="card-row">
-                    <span>Target Balance:</span>
-                    <span id="targetBalanceCombined" class="value"></span>
-                </div>
-                <div class="card-row">
-                    <span>Total Gains:</span>
-                    <span id="totalGainsCombined" class="value"></span>
-                </div>
-                <div class="card-row">
-                    <span>Wallet Balance Needed:</span>
-                    <span id="walletBalanceNeededCombined" class="value"></span>
-                </div>
-                <hr style="width:100%; border:0; border-top:1px solid var(--border-color); margin: 10px 0;">
-                <div class="card-row">
-                    <span>Days Remaining (Linear Target):</span>
-                    <span id="daysRemainingLinear" class="value"></span>
-                </div>
-                 <div class="card-row">
-                    <span>Days Remaining (Selected Projection):</span>
-                    <span id="daysRemainingCompounding" class="value"></span>
-                </div>
-                 <hr style="width:100%; border:0; border-top:1px solid var(--border-color); margin: 10px 0;">
-                <div class="card-row">
-                    <span>Target Trading Volume (USDT):</span>
-                    <input type="number" id="targetTradingVolumeInput" value="300" step="1">
-                </div>
-                <div class="card-row">
-                    <span>Current Total Trading Volume:</span>
-                    <span id="currentTotalTradingVolume" class="value"></span>
-                </div>
-                <div class="card-row">
-                    <span>Days Remaining (Volume Target):</span>
-                    <span id="daysRemainingVolumeTarget" class="value"></span>
-                </div>
-            </div>
-        </div>
-        
-        <div class="card" id="financialGoalsCard">
-            <h2>Financial Goals & Settings</h2>
-            <div class="card-content">
-                <div class="card-group">
-                    <h4>Core Financial Inputs</h4>
-                    <div class="card-row">
-                        <span>USDT/PHP Rate:</span>
-                        <input type="number" id="usdtPhpRate" value="56.81" step="0.01">
+        <div class="row g-4" id="card-container">
+            <!-- All cards now use the same column classes for consistent width -->
+            <div class="col-12 col-lg-6 col-xl-4">
+                <div class="card shadow-sm" id="dataInputCard">
+                    <div class="card-header d-flex justify-content-between align-items-center" data-bs-toggle="collapse" href="#collapseDataInput" role="button" aria-expanded="true" aria-controls="collapseDataInput">
+                        <h2 class="h5 mb-0"><i class="bi bi-file-earmark-plus me-2"></i>Input & Data</h2>
+                        <i class="bi bi-chevron-down collapse-icon"></i>
                     </div>
-                    <div class="card-row">
-                        <span>Target Monthly Income (₱):</span>
-                        <input type="number" id="targetMonthlyIncomePhp" value="50000" step="100">
-                    </div>
-                    <div class="card-row">
-                        <span>Starting Balance (USDT):</span>
-                        <input type="number" id="startingBalanceUsdt" value="301" step="0.01">
-                    </div>
-                </div>
-
-                <div class="card-group">
-                    <h4>Projection Settings</h4>
-                    <div class="projection-method-selection">
-                        <label>
-                            <input type="radio" name="projectionMethod" value="percent" id="projectionMethodPercent">
-                            By % Gain Per Trade
-                        </label>
-                        <label>
-                            <input type="radio" name="projectionMethod" value="fixedRoi" id="projectionMethodFixedRoi">
-                            By Fixed Trade Amt & ROI
-                        </label>
-                    </div>
-                    <div class="card-row">
-                        <span>Projection Period (Days):</span>
-                        <input type="number" id="projectionPeriodDaysInput" value="90" step="1">
-                    </div>
-                    <div class="card-row">
-                        <span>Trades Per Day:</span>
-                        <input type="number" id="tradesPerDayInput" value="2" step="1">
-                    </div>
-
-                    <div id="percentProjectionInputs" style="display: none;">
-                        <div class="card-group-subsection">
-                            <h5>% Gain Projection Details</h5>
-                            <div class="card-row">
-                                <span>Projected Gain Per Trade (%):</span>
-                                <input type="number" id="projectedGainPerTradeInput" value="1" step="0.1">
-                            </div>
-                        </div>
-                    </div>
-
-                    <div id="fixedRoiProjectionInputs" style="display: none;">
-                        <div class="card-group-subsection">
-                            <h5>Fixed Amount & ROI Projection Details</h5>
-                            <div class="card-row">
-                                <span>Projected Trade Amount (USDT):</span>
-                                <input type="number" id="projectedTradeAmountInput" value="3.00" step="0.01">
-                            </div>
-                            <div class="card-row">
-                                <span>Projected ROI Per Trade (%):</span>
-                                <input type="number" id="projectedRoiPerTradeInput" value="70" step="1">
+                    <div class="collapse show" id="collapseDataInput">
+                        <div class="card-body">
+                            <textarea id="tradeDataInput" class="form-control mb-2" rows="8" placeholder="Paste detailed trade history here..."></textarea>
+                            <button id="processDataButton" class="btn btn-primary w-100">Process Trades</button>
+                            <div class="d-flex gap-2 mt-2">
+                                <button id="importDataButton" class="btn btn-secondary w-50">Import Data</button>
+                                <button id="exportDataButton" class="btn btn-secondary w-50">Export Data</button>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <div class="card">
-            <h2>Trading Schedule Planner</h2>
-            <div class="card-content">
-                <textarea id="schedulePlannerInput" rows="5" placeholder="e.g., Monday: 9 AM - 12 PM, Focus on BTC/USDT..."></textarea>
-                <p>Your schedule will auto-save.</p>
+            <div class="col-12 col-lg-6 col-xl-4">
+                <div class="card shadow-sm" id="balanceOverviewCard">
+                    <div class="card-header d-flex justify-content-between align-items-center" data-bs-toggle="collapse" href="#collapseBalance" role="button" aria-expanded="true" aria-controls="collapseBalance">
+                        <h2 class="h5 mb-0"><i class="bi bi-wallet2 me-2"></i>Balance Overview</h2>
+                         <i class="bi bi-chevron-down collapse-icon"></i>
+                    </div>
+                    <div class="collapse show" id="collapseBalance">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between mb-2"><span>Previous Balance:</span> <strong id="previousBalanceCombined"></strong></div>
+                            <div class="d-flex justify-content-between mb-2"><span>Calculated Balance:</span> <strong id="calculatedBalanceCombined"></strong></div>
+                            <hr>
+                            <div class="mb-2">
+                                <label for="actualCurrentBalanceUsdtInput" class="form-label">Actual Current Balance (USDT)</label>
+                                <input type="number" id="actualCurrentBalanceUsdtInput" value="0" step="0.01" class="form-control">
+                            </div>
+                            <div class="d-flex justify-content-between"><strong>Discrepancy:</strong> <strong id="discrepancyCombined"></strong></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12 col-lg-6 col-xl-4">
+                <div class="card shadow-sm" id="gainsSummaryCard">
+                    <div class="card-header d-flex justify-content-between align-items-center" data-bs-toggle="collapse" href="#collapseGains" role="button" aria-expanded="true" aria-controls="collapseGains">
+                        <h2 class="h5 mb-0"><i class="bi bi-graph-up-arrow me-2"></i>Gains Summary</h2>
+                         <i class="bi bi-chevron-down collapse-icon"></i>
+                    </div>
+                    <div class="collapse show" id="collapseGains">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between mb-2"><span>Current Gain (USDT):</span> <strong id="currentGainUsdt"></strong></div>
+                            <div class="d-flex justify-content-between mb-2"><span>Current Gain (₱):</span> <strong id="currentGainPhp"></strong></div>
+                            <div class="d-flex justify-content-between mb-2"><span>Current ROI:</span> <strong id="currentRoi"></strong></div>
+                            <hr>
+                            <div class="d-flex justify-content-between mb-2"><span>Gain Difference (USDT):</span> <strong id="gainDifferenceUsdt"></strong></div>
+                            <div class="d-flex justify-content-between mb-2"><span>Trade Amount Growth:</span> <strong id="tradeAmountGrowth"></strong></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12 col-lg-6 col-xl-4">
+                <div class="card shadow-sm" id="streakAnalyticsCard">
+                    <div class="card-header d-flex justify-content-between align-items-center" data-bs-toggle="collapse" href="#collapseStreaks" role="button" aria-expanded="true" aria-controls="collapseStreaks">
+                        <h2 class="h5 mb-0"><i class="bi bi-trophy me-2"></i>Streak Analytics</h2>
+                         <i class="bi bi-chevron-down collapse-icon"></i>
+                    </div>
+                    <div class="collapse show" id="collapseStreaks">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between mb-2"><span>Current Win Streak:</span> <strong id="currentWinStreak" class="positive"></strong></div>
+                            <div class="d-flex justify-content-between mb-2"><span>Longest Win Streak:</span> <strong id="longestWinStreak" class="positive"></strong></div>
+                            <div class="d-flex justify-content-between mb-2"><span>Current Loss Streak:</span> <strong id="currentLossStreak" class="negative"></strong></div>
+                            <div class="d-flex justify-content-between mb-2"><span>Longest Loss Streak:</span> <strong id="longestLossStreak" class="negative"></strong></div>
+                            <hr>
+                            <div class="d-flex justify-content-between mb-2"><span>Total Wins / Losses:</span> <strong><span id="totalWins" class="positive"></span> / <span id="totalLosses" class="negative"></span></strong></div>
+                            <div class="d-flex justify-content-between"><span>Win Rate:</span> <strong id="winRate"></strong></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12 col-lg-6 col-xl-4">
+                <div class="card shadow-sm" id="financialGoalsCard">
+                    <div class="card-header d-flex justify-content-between align-items-center" data-bs-toggle="collapse" href="#collapseGoals" role="button" aria-expanded="true" aria-controls="collapseGoals">
+                         <h2 class="h5 mb-0"><i class="bi bi-gear me-2"></i>Goals & Settings</h2>
+                         <i class="bi bi-chevron-down collapse-icon"></i>
+                    </div>
+                    <div class="collapse show" id="collapseGoals">
+                        <div class="card-body">
+                             <h6 class="text-muted">Core Inputs</h6>
+                             <div class="mb-2"><label>USDT/PHP Rate:</label><input type="number" id="usdtPhpRate" class="form-control form-control-sm"></div>
+                             <div class="mb-2"><label>Target Monthly Income (₱):</label><input type="number" id="targetMonthlyIncomePhp" class="form-control form-control-sm"></div>
+                             <div class="mb-3"><label>Starting Balance (USDT):</label><input type="number" id="startingBalanceUsdt" class="form-control form-control-sm"></div>
+                             <hr>
+                             <h6 class="text-muted">Volume Target</h6>
+                             <div class="mb-2"><label>Target Trading Volume (USDT):</label><input type="number" id="targetTradingVolumeInput" class="form-control form-control-sm"></div>
+                             <div class="d-flex justify-content-between"><span>Days Remaining (Volume):</span> <strong id="daysRemainingVolumeTarget"></strong></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12 col-lg-6 col-xl-4">
+                <div class="card shadow-sm" id="projectionSettingsCard">
+                     <div class="card-header d-flex justify-content-between align-items-center" data-bs-toggle="collapse" href="#collapseProjections" role="button" aria-expanded="true" aria-controls="collapseProjections">
+                         <h2 class="h5 mb-0"><i class="bi bi-binoculars me-2"></i>Projection Settings</h2>
+                         <i class="bi bi-chevron-down collapse-icon"></i>
+                    </div>
+                    <div class="collapse show" id="collapseProjections">
+                        <div class="card-body">
+                             <div class="mb-2"><label>Method:</label><select id="projectionMethodSelect" class="form-select form-select-sm"><option value="percent">By % Gain Per Trade</option><option value="fixedRoi">By Fixed Trade Amt & ROI</option></select></div>
+                             <div class="mb-2"><label>Trades Per Day:</label><input type="number" id="tradesPerDayInput" class="form-control form-control-sm"></div>
+                             <div class="mb-3"><label>Projection Period (Days):</label><input type="number" id="projectionPeriodDaysInput" class="form-control form-control-sm"></div>
+                             <div id="percentProjectionInputs"><hr><h6 class="text-muted">% Gain Details</h6><div class="mb-2"><label>Projected Gain Per Trade (%):</label><input type="number" id="projectedGainPerTradeInput" class="form-control form-control-sm"></div></div>
+                             <div id="fixedRoiProjectionInputs"><hr><h6 class="text-muted">Fixed Amount Details</h6><div class="mb-2"><label>Projected Trade Amount (USDT):</label><input type="number" id="projectedTradeAmountInput" class="form-control form-control-sm"></div><div class="mb-2"><label>Projected ROI Per Trade (%):</label><input type="number" id="projectedRoiPerTradeInput" class="form-control form-control-sm"></div></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12 col-lg-6 col-xl-4">
+                <div class="card shadow-sm" id="processedHistoryCard">
+                    <div class="card-header d-flex justify-content-between align-items-center" data-bs-toggle="collapse" href="#collapseHistory" role="button" aria-expanded="true" aria-controls="collapseHistory">
+                        <h3 class="h5 mb-0"><i class="bi bi-list-ol me-2"></i>Processed Trade History</h3>
+                        <i class="bi bi-chevron-down collapse-icon"></i>
+                    </div>
+                    <div class="collapse show" id="collapseHistory">
+                        <div class="card-body">
+                             <div id="tradeHistoryOutput" class="p-2 border rounded bg-light-subtle"><p class="text-center text-muted m-0">No trade data processed yet.</p></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-12 col-lg-6 col-xl-4">
+                <div class="card shadow-sm" id="schedulePlannerCard">
+                    <div class="card-header d-flex justify-content-between align-items-center" data-bs-toggle="collapse" href="#collapseSchedule" role="button" aria-expanded="true" aria-controls="collapseSchedule">
+                         <h2 class="h5 mb-0"><i class="bi bi-calendar-week me-2"></i>Trading Schedule</h2>
+                         <i class="bi bi-chevron-down collapse-icon"></i>
+                    </div>
+                    <div class="collapse show" id="collapseSchedule">
+                        <div class="card-body">
+                             <textarea id="schedulePlannerInput" class="form-control" rows="5" placeholder="e.g., Monday: 9 AM - 12 PM, Focus on BTC/USDT..."></textarea>
+                             <small class="form-text text-muted">Your schedule will auto-save.</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chart Cards -->
+            <div class="col-12 col-lg-6 col-xl-4"><div class="card shadow-sm" id="cumulativeBalanceChartCard"><div class="card-header d-flex justify-content-between align-items-center" data-bs-toggle="collapse" href="#collapseCumBalance" role="button" aria-expanded="true" aria-controls="collapseCumBalance"><h2 class="h5 mb-0">Cumulative Balance</h2><i class="bi bi-chevron-down collapse-icon"></i></div><div class="collapse show" id="collapseCumBalance"><div class="card-body"><div class="chart-container"><canvas id="cumulativeBalanceChart"></canvas></div></div></div></div></div>
+            <div class="col-12 col-lg-6 col-xl-4"><div class="card shadow-sm" id="projectedGrowthChartCard"><div class="card-header d-flex justify-content-between align-items-center" data-bs-toggle="collapse" href="#collapseProjGrowth" role="button" aria-expanded="true" aria-controls="collapseProjGrowth"><h2 class="h5 mb-0">Projected Growth</h2><i class="bi bi-chevron-down collapse-icon"></i></div><div class="collapse show" id="collapseProjGrowth"><div class="card-body"><div class="chart-container"><canvas id="projectedGrowthChart"></canvas></div></div></div></div></div>
+            <div class="col-12 col-lg-6 col-xl-4"><div class="card shadow-sm" id="dailyPnlChartCard"><div class="card-header d-flex justify-content-between align-items-center" data-bs-toggle="collapse" href="#collapseDailyPnl" role="button" aria-expanded="true" aria-controls="collapseDailyPnl"><h2 class="h5 mb-0">Daily PNL</h2><i class="bi bi-chevron-down collapse-icon"></i></div><div class="collapse show" id="collapseDailyPnl"><div class="card-body"><div class="chart-container"><canvas id="dailyPnLChart"></canvas></div></div></div></div></div>
+            <div class="col-12 col-lg-6 col-xl-4"><div class="card shadow-sm" id="pnlByDayChartCard"><div class="card-header d-flex justify-content-between align-items-center" data-bs-toggle="collapse" href="#collapsePnlDay" role="button" aria-expanded="true" aria-controls="collapsePnlDay"><h2 class="h5 mb-0">PNL by Day</h2><i class="bi bi-chevron-down collapse-icon"></i></div><div class="collapse show" id="collapsePnlDay"><div class="card-body"><div class="chart-container"><canvas id="pnlByDayChart"></canvas></div></div></div></div></div>
+            <div class="col-12 col-lg-6 col-xl-4"><div class="card shadow-sm" id="pnlByAssetChartCard"><div class="card-header d-flex justify-content-between align-items-center" data-bs-toggle="collapse" href="#collapsePnlAsset" role="button" aria-expanded="true" aria-controls="collapsePnlAsset"><h2 class="h5 mb-0">Performance by Asset</h2><i class="bi bi-chevron-down collapse-icon"></i></div><div class="collapse show" id="collapsePnlAsset"><div class="card-body"><div class="chart-container"><canvas id="pnlByAssetChart"></canvas></div></div></div></div></div>
+            <div class="col-12 col-lg-6 col-xl-4"><div class="card shadow-sm" id="avgWinLossChartCard"><div class="card-header d-flex justify-content-between align-items-center" data-bs-toggle="collapse" href="#collapseAvgWinLoss" role="button" aria-expanded="true" aria-controls="collapseAvgWinLoss"><h2 class="h5 mb-0">Avg Win vs. Loss</h2><i class="bi bi-chevron-down collapse-icon"></i></div><div class="collapse show" id="collapseAvgWinLoss"><div class="card-body"><div class="chart-container"><canvas id="avgWinLossChart"></canvas></div></div></div></div></div>
+            <div class="col-12 col-lg-6 col-xl-4"><div class="card shadow-sm" id="dailyVolumeChartCard"><div class="card-header d-flex justify-content-between align-items-center" data-bs-toggle="collapse" href="#collapseDailyVol" role="button" aria-expanded="true" aria-controls="collapseDailyVol"><h2 class="h5 mb-0">Daily Volume</h2><i class="bi bi-chevron-down collapse-icon"></i></div><div class="collapse show" id="collapseDailyVol"><div class="card-body"><div class="chart-container"><canvas id="dailyVolumeChart"></canvas></div></div></div></div></div>
+            <div class="col-12 col-lg-6 col-xl-4"><div class="card shadow-sm" id="dailyRoiChartCard"><div class="card-header d-flex justify-content-between align-items-center" data-bs-toggle="collapse" href="#collapseDailyRoi" role="button" aria-expanded="true" aria-controls="collapseDailyRoi"><h2 class="h5 mb-0">Daily ROI</h2><i class="bi bi-chevron-down collapse-icon"></i></div><div class="collapse show" id="collapseDailyRoi"><div class="card-body"><div class="chart-container"><canvas id="dailyRoiChart"></canvas></div></div></div></div></div>
+            <div class="col-12 col-lg-6 col-xl-4"><div class="card shadow-sm" id="monthlyPnlChartCard"><div class="card-header d-flex justify-content-between align-items-center" data-bs-toggle="collapse" href="#collapseMonthlyPnl" role="button" aria-expanded="true" aria-controls="collapseMonthlyPnl"><h2 class="h5 mb-0">Monthly PNL</h2><i class="bi bi-chevron-down collapse-icon"></i></div><div class="collapse show" id="collapseMonthlyPnl"><div class="card-body"><div class="chart-container"><canvas id="monthlyPnLChart"></canvas></div></div></div></div></div>
+            <div class="col-12 col-lg-6 col-xl-4"><div class="card shadow-sm" id="monthlyVolumeChartCard"><div class="card-header d-flex justify-content-between align-items-center" data-bs-toggle="collapse" href="#collapseMonthlyVol" role="button" aria-expanded="true" aria-controls="collapseMonthlyVol"><h2 class="h5 mb-0">Monthly Volume</h2><i class="bi bi-chevron-down collapse-icon"></i></div><div class="collapse show" id="collapseMonthlyVol"><div class="card-body"><div class="chart-container"><canvas id="monthlyVolumeChart"></canvas></div></div></div></div></div>
+            <div class="col-12 col-lg-6 col-xl-4"><div class="card shadow-sm" id="discrepancyChartCard"><div class="card-header d-flex justify-content-between align-items-center" data-bs-toggle="collapse" href="#collapseDiscrepancy" role="button" aria-expanded="true" aria-controls="collapseDiscrepancy"><h2 class="h5 mb-0">Discrepancy History</h2><i class="bi bi-chevron-down collapse-icon"></i></div><div class="collapse show" id="collapseDiscrepancy"><div class="card-body"><div class="chart-container"><canvas id="discrepancyChart"></canvas></div></div></div></div></div>
+
+            <div class="col-12 text-center">
+                 <button class="btn btn-danger" id="resetDataButtonBottom"><i class="bi bi-trash me-2"></i>Reset All Data</button>
             </div>
         </div>
+    </div>
 
-        <div class="card chart-card">
-            <h2>Daily Trade Volume</h2>
-            <div class="chart-container">
-                <canvas id="dailyVolumeChart"></canvas>
+    <!-- Bootstrap Modal -->
+    <div class="modal fade" id="setupModal" tabindex="-1" aria-labelledby="setupModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h1 class="modal-title fs-5" id="setupModalLabel">Welcome to Your Trade Tracker!</h1>
+          </div>
+          <div class="modal-body" id="setupModalBody">
+            <!-- Modal content is generated by JavaScript -->
+          </div>
+          <div class="modal-footer justify-content-between">
+            <div>Step <span id="currentStepNumber">1</span> of <span id="totalStepsNumber"></span></div>
+            <div>
+                <button type="button" class="btn btn-secondary" id="setupPrevButton" disabled>Previous</button>
+                <button type="button" class="btn btn-primary" id="setupNextButton">Next</button>
+                <button type="button" class="btn btn-success" id="setupStartButton" style="display: none;">Start Tracking!</button>
             </div>
+          </div>
         </div>
-
-        <div class="card chart-card">
-            <h2>Balance Discrepancy Over Time</h2>
-            <div class="chart-container">
-                <canvas id="discrepancyChart"></canvas>
-            </div>
-        </div>
-
-        <div class="card chart-card">
-            <h2>Monthly PNL Progress</h2>
-            <div class="chart-container">
-                <canvas id="monthlyPnLChart"></canvas>
-            </div>
-        </div>
-
-        <div class="card chart-card">
-            <h2>Monthly Trade Volume</h2>
-            <div class="chart-container">
-                <canvas id="monthlyVolumeChart"></canvas>
-            </div>
-        </div>
-
-        <div class="reset-button-bottom-container">
-            <button class="reset-button-bottom" id="resetDataButtonBottom">Reset All Data</button>
-        </div>
+      </div>
     </div>
 
     <audio id="winSound" src="https://cdn.pixabay.com/audio/2022/03/15/audio_73138b3213.mp3" preload="auto"></audio>
     <audio id="lossSound" src="https://cdn.pixabay.com/audio/2021/08/04/audio_593713fba2.mp3" preload="auto"></audio>
 
-    <div class="setup-modal-overlay" id="setupModalOverlay">
-        <div class="setup-modal-content">
-            <h2 id="setupModalTitle">Welcome to Your Trade Tracker!</h2>
-            <div id="setupModalBody">
-                </div>
-            <div class="setup-modal-navigation">
-                <button id="setupPrevButton" disabled>Previous</button>
-                <button id="setupNextButton">Next</button>
-                <button id="setupStartButton" class="start-tracking-button" style="display: none;">Start Tracking!</button>
-            </div>
-            <div class="setup-modal-progress">
-                Step <span id="currentStepNumber">1</span> of <span id="totalStepsNumber"></span>
-            </div>
-        </div>
-    </div>
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" xintegrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    
+    <script>
+    /* --- JAVASCRIPT LOGIC (script.js) --- */
+    // --- GLOBAL VARIABLES (Accessible throughout the script) ---
+    let monthlyPnLChart, monthlyVolumeChart, dailyRoiChart, dailyPnLChart, dailyVolumeChart, discrepancyChart, cumulativeBalanceChart, projectedGrowthChart, pnlByDayChart, pnlByAssetChart, avgWinLossChart;
+    let setupModal;
 
-    <script src="script.js"></script>
+    const DEFAULT_APP_SETTINGS = { usdtPhpRate: 57.11, targetMonthlyIncomePhp: 50000, startingBalanceUsdt: 301, projectedGainPerTrade: 1, tradesPerDay: 2, projectionPeriodDays: 90, projectedTradeAmount: 3.00, projectedRoiPerTrade: 70, selectedProjectionMethod: 'percent', theme: 'light', schedulePlanner: '', targetTradingVolume: 300 };
+    const DEFAULT_BALANCE_DATA = { previousBalanceUsdt: 0, calculatedBalanceUsdt: 0, actualBalanceUsdt: 0 };
+    const DEFAULT_LAST_TRADE_STATS = { currentGainUsdt: 0, currentRoi: 0, previousGainUsdt: 0, lastTradeAmount: 0, previousTradeAmount: 0 };
+    const DEFAULT_CARD_STATES = {};
+
+    let tradeHistory = [], appSettings = { ...DEFAULT_APP_SETTINGS }, balanceData = { ...DEFAULT_BALANCE_DATA }, lastTradeStats = { ...DEFAULT_LAST_TRADE_STATS }, cardStates = { ...DEFAULT_CARD_STATES }, discrepancyHistory = [], cumulativeBalanceHistory = [], projectedGrowthHistory = [];
+
+    let currentSetupStep = 0;
+    const setupSteps = [
+        { title: "Welcome!", body: () => `<p>This tracker helps you monitor your trading progress. Let's set up your core financial goals to get started.</p><p>Click 'Next' to begin.</p>` },
+        {
+            title: "Step 1: Update Core Financials",
+            body: () => `<div class="mb-3"><label for="modalStartingBalance" class="form-label">Starting Balance (USDT)</label><input type="number" id="modalStartingBalance" value="${appSettings.startingBalanceUsdt}" step="0.01" class="form-control"></div><div class="mb-3"><label for="modalUsdtPhpRate" class="form-label">Current USDT/PHP Rate</label><input type="number" id="modalUsdtPhpRate" value="${appSettings.usdtPhpRate}" step="0.01" class="form-control"></div><div class="mb-3"><label for="modalTargetIncome" class="form-label">Target Monthly Income (₱)</label><input type="number" id="modalTargetIncome" value="${appSettings.targetMonthlyIncomePhp}" step="100" class="form-control"></div>`,
+            save: () => {
+                appSettings.startingBalanceUsdt = parseFloat(document.getElementById('modalStartingBalance').value) || DEFAULT_APP_SETTINGS.startingBalanceUsdt;
+                appSettings.usdtPhpRate = parseFloat(document.getElementById('modalUsdtPhpRate').value) || DEFAULT_APP_SETTINGS.usdtPhpRate;
+                appSettings.targetMonthlyIncomePhp = parseFloat(document.getElementById('modalTargetIncome').value) || DEFAULT_APP_SETTINGS.targetMonthlyIncomePhp;
+            }
+        },
+        { title: "Step 2: Add Trade History", body: () => `<p>Your financial settings are saved.</p><p>You can now close this guide and use the <strong>Input & Data Management</strong> card to paste or import your trades.</p>`},
+        { title: "Step 3: Update Actual Balance", body: () => `<p>After adding trades, go to the <strong>Balance Overview</strong> card and enter your current wallet balance in the 'Actual Current Balance' field.</p><p>This will calculate any discrepancy between your expected and actual funds.</p>`},
+        { title: "You're All Set!", body: () => `<p>You're ready to start tracking! Remember to follow the steps whenever you update your data.</p><p>Happy trading!</p>` }
+    ];
+
+    // --- Helper Functions ---
+    const cleanLine = (line) => line.replace(/[\u00A0\u200B-\u200D\uFEFF]/g, ' ').replace(/\s+/g, ' ').trim();
+    const formatCurrency = (amount, currency = 'USDT') => `${amount.toFixed(2)} ${currency}`;
+    const formatPhp = (amount) => `₱${amount.toFixed(2)}`;
+    const formatDecimalPercentage = (value) => `${value.toFixed(2)} %`;
+    const formatPercentage = (value) => `${value.toFixed(2)}%`;
+    const formatCombinedCurrency = (usdt, rate) => `${usdt.toFixed(2)} USDT (₱${(usdt * rate).toFixed(2)})`;
+
+    function playSound(type) {
+        const sound = document.getElementById(type === 'win' ? 'winSound' : 'lossSound');
+        if (sound) sound.play().catch(e => console.error(`Error playing ${type} sound:`, e));
+    }
+
+    function toggleProjectionInputs(method) {
+        document.getElementById('percentProjectionInputs').style.display = method === 'percent' ? 'block' : 'none';
+        document.getElementById('fixedRoiProjectionInputs').style.display = method === 'fixedRoi' ? 'block' : 'none';
+    }
+
+    // --- State Management ---
+    function saveState() {
+        localStorage.setItem('tradeTrackerData', JSON.stringify({ tradeHistory, appSettings, balanceData, lastTradeStats, cardStates, discrepancyHistory, cumulativeBalanceHistory, projectedGrowthHistory }));
+    }
+
+    function loadState(dataToLoad = null) {
+        const data = dataToLoad || (JSON.parse(localStorage.getItem('tradeTrackerData')) || {});
+        tradeHistory = data.tradeHistory || [];
+        appSettings = { ...DEFAULT_APP_SETTINGS, ...(data.appSettings || {}) };
+        balanceData = { ...DEFAULT_BALANCE_DATA, ...(data.balanceData || {}) };
+        lastTradeStats = { ...DEFAULT_LAST_TRADE_STATS, ...(data.lastTradeStats || {}) };
+        cardStates = data.cardStates || {};
+        discrepancyHistory = data.discrepancyHistory || [];
+        cumulativeBalanceHistory = data.cumulativeBalanceHistory || [];
+        projectedGrowthHistory = data.projectedGrowthHistory || [];
+        updateUiFromState();
+    }
+    
+    function updateUiFromState() {
+        Object.keys(appSettings).forEach(key => {
+            const el = document.getElementById(key) || document.getElementById(key + 'Input') || document.getElementById(key + 'Select');
+            if (el) el.value = appSettings[key];
+        });
+        document.getElementById('actualCurrentBalanceUsdtInput').value = balanceData.actualBalanceUsdt;
+        document.documentElement.setAttribute('data-bs-theme', appSettings.theme);
+        toggleProjectionInputs(appSettings.selectedProjectionMethod);
+
+        for (const cardId in cardStates) {
+            const card = document.getElementById(cardId);
+            const collapseEl = document.querySelector(`[href="#${card?.querySelector('.collapse')?.id}"]`);
+            if (card && collapseEl) {
+                const bsCollapse = bootstrap.Collapse.getOrCreateInstance(collapseEl.getAttribute('href'));
+                if (cardStates[cardId] === 'collapsed') bsCollapse.hide();
+                else bsCollapse.show();
+            }
+        }
+    }
+
+    // --- Core Logic ---
+    function updateAllMetrics() {
+        // Update settings from UI
+        appSettings.usdtPhpRate = parseFloat(document.getElementById('usdtPhpRate').value);
+        appSettings.targetMonthlyIncomePhp = parseFloat(document.getElementById('targetMonthlyIncomePhp').value);
+        appSettings.startingBalanceUsdt = parseFloat(document.getElementById('startingBalanceUsdt').value);
+        appSettings.projectedGainPerTrade = parseFloat(document.getElementById('projectedGainPerTradeInput').value);
+        appSettings.tradesPerDay = parseInt(document.getElementById('tradesPerDayInput').value);
+        appSettings.projectionPeriodDays = parseInt(document.getElementById('projectionPeriodDaysInput').value);
+        appSettings.projectedTradeAmount = parseFloat(document.getElementById('projectedTradeAmountInput').value);
+        appSettings.projectedRoiPerTrade = parseFloat(document.getElementById('projectedRoiPerTradeInput').value);
+        appSettings.targetTradingVolume = parseFloat(document.getElementById('targetTradingVolumeInput').value);
+        balanceData.actualBalanceUsdt = parseFloat(document.getElementById('actualCurrentBalanceUsdtInput').value);
+
+        // Calculations... (This part remains largely the same)
+        let totalPnL = tradeHistory.reduce((sum, trade) => sum + (trade.pnl || 0), 0);
+        balanceData.calculatedBalanceUsdt = appSettings.startingBalanceUsdt + totalPnL;
+        const lastTrade = tradeHistory.length > 0 ? tradeHistory[tradeHistory.length - 1] : null;
+        if(lastTrade) Object.assign(lastTradeStats, { currentGainUsdt: lastTrade.pnl || 0, currentRoi: lastTrade.roi || 0, lastTradeAmount: lastTrade.effectiveVolume || 0 });
+
+        // Update UI elements
+        document.getElementById('calculatedBalanceCombined').textContent = formatCombinedCurrency(balanceData.calculatedBalanceUsdt, appSettings.usdtPhpRate);
+        document.getElementById('discrepancyCombined').textContent = formatCombinedCurrency(balanceData.actualBalanceUsdt - balanceData.calculatedBalanceUsdt, appSettings.usdtPhpRate);
+        document.getElementById('currentGainUsdt').textContent = formatCurrency(lastTradeStats.currentGainUsdt);
+        document.getElementById('currentGainPhp').textContent = formatPhp(lastTradeStats.currentGainUsdt * appSettings.usdtPhpRate);
+        document.getElementById('currentRoi').textContent = formatDecimalPercentage(lastTradeStats.currentRoi);
+        
+        // Streaks
+        let wins = 0, losses = 0;
+        tradeHistory.forEach(t => t.pnl >= 0 ? wins++ : losses++);
+        document.getElementById('totalWins').textContent = wins;
+        document.getElementById('totalLosses').textContent = losses;
+        document.getElementById('winRate').textContent = formatPercentage(tradeHistory.length > 0 ? (wins / tradeHistory.length) * 100 : 0);
+        
+        // ... other UI updates ...
+        
+        updateCharts();
+        saveState();
+    }
+
+    function initializeCharts() {
+        const commonLineOptions = {
+            responsive: true, maintainAspectRatio: false,
+            scales: { y: { beginAtZero: false, ticks: { callback: value => value.toFixed(2) + ' USDT' } }, x: { title: { display: true } } },
+            plugins: { tooltip: { callbacks: { label: context => `${context.dataset.label}: ${context.parsed.y.toFixed(2)} USDT` } } }
+        };
+        
+        monthlyPnLChart = new Chart('monthlyPnLChart', { type: 'line', data: { datasets: [{ label: 'Monthly PNL (USDT)', tension: 0.1, fill: false }] }, options: { ...commonLineOptions, scales: { ...commonLineOptions.scales, x: { ...commonLineOptions.scales.x, title: { ...commonLineOptions.scales.x.title, text: 'Month' } } } } });
+        monthlyVolumeChart = new Chart('monthlyVolumeChart', { type: 'bar', data: { datasets: [{ label: 'Monthly Trade Volume (USDT)' }] }, options: { ...commonLineOptions, scales: { ...commonLineOptions.scales, x: { ...commonLineOptions.scales.x, title: { ...commonLineOptions.scales.x.title, text: 'Month' } } } } });
+        dailyRoiChart = new Chart('dailyRoiChart', { type: 'line', data: { datasets: [{ label: 'Daily ROI (%)', borderColor: 'rgb(255, 159, 64)', tension: 0.1 }] }, options: { ...commonLineOptions, scales: { y: { ticks: { callback: value => value.toFixed(2) + ' %' } }, x: { ...commonLineOptions.scales.x, title: { ...commonLineOptions.scales.x.title, text: 'Date' } } } } });
+        dailyPnLChart = new Chart('dailyPnLChart', { type: 'bar', data: { datasets: [{ label: 'Daily PNL (USDT)' }] }, options: { ...commonLineOptions, scales: { ...commonLineOptions.scales, x: { ...commonLineOptions.scales.x, title: { ...commonLineOptions.scales.x.title, text: 'Date' } } } } });
+        dailyVolumeChart = new Chart('dailyVolumeChart', { type: 'line', data: { datasets: [{ label: 'Daily Trade Volume (USDT)', borderColor: 'rgb(54, 162, 235)', tension: 0.1 }] }, options: { ...commonLineOptions, scales: { ...commonLineOptions.scales, x: { ...commonLineOptions.scales.x, title: { ...commonLineOptions.scales.x.title, text: 'Date' } } } } });
+        discrepancyChart = new Chart('discrepancyChart', { type: 'line', data: { datasets: [{ label: 'Balance Discrepancy (USDT)', borderColor: 'rgb(255, 99, 132)', tension: 0.1 }] }, options: { ...commonLineOptions, scales: { ...commonLineOptions.scales, x: { ...commonLineOptions.scales.x, title: { ...commonLineOptions.scales.x.title, text: 'Time of Update' } } } } });
+        cumulativeBalanceChart = new Chart('cumulativeBalanceChart', { type: 'line', data: { datasets: [{ label: 'Cumulative Balance (USDT)', tension: 0.1, fill: true, backgroundColor: 'rgba(75, 192, 192, 0.2)' }] }, options: { ...commonLineOptions, scales: { ...commonLineOptions.scales, x: { ...commonLineOptions.scales.x, title: { ...commonLineOptions.scales.x.title, text: 'Time' } } } } });
+        projectedGrowthChart = new Chart('projectedGrowthChart', {
+            type: 'line',
+            data: {
+                labels: [],
+                datasets: [
+                    { label: 'Projected Balance', data: [], borderColor: 'rgb(0, 123, 255)', borderDash: [5, 5], tension: 0.1, pointRadius: 0 },
+                    { label: 'Actual Cumulative Balance', data: [], borderColor: 'rgb(40, 167, 69)', tension: 0.1, pointRadius: 3 }
+                ]
+            },
+            options: { ...commonLineOptions, scales: { ...commonLineOptions.scales, x: { ...commonLineOptions.scales.x, title: { ...commonLineOptions.scales.x.title, text: 'Date' } } } }
+        });
+        
+        pnlByDayChart = new Chart('pnlByDayChart', { type: 'bar', data: { datasets: [{ label: 'Total PNL (USDT)' }] }, options: { ...commonLineOptions, scales: { ...commonLineOptions.scales, x: { ...commonLineOptions.scales.x, title: { ...commonLineOptions.scales.x.title, text: 'Day of the Week' } } } } });
+        pnlByAssetChart = new Chart('pnlByAssetChart', { type: 'bar', data: { datasets: [{ label: 'Total PNL (USDT)', backgroundColor: 'rgba(75, 192, 192, 0.6)' }, { label: 'Win Rate (%)', type: 'line', yAxisID: 'y1', borderColor: 'rgb(255, 159, 64)', tension: 0.1 }] }, options: { ...commonLineOptions, scales: { ...commonLineOptions.scales, x: { ...commonLineOptions.scales.x, title: { ...commonLineOptions.scales.x.title, text: 'Asset' } }, y1: { type: 'linear', display: true, position: 'right', grid: { drawOnChartArea: false }, ticks: { callback: value => value.toFixed(1) + '%' } } } } });
+        avgWinLossChart = new Chart('avgWinLossChart', { type: 'bar', data: { datasets: [{ label: 'Average Amount (USDT)' }] }, options: { ...commonLineOptions, scales: { ...commonLineOptions.scales, x: { ...commonLineOptions.scales.x, title: { text: 'Outcome' } } } } });
+    }
+
+    function updateCharts() {
+        const monthlyData = {};
+        const dailyData = {};
+        const pnlByDay = { 'Sun': 0, 'Mon': 0, 'Tue': 0, 'Wed': 0, 'Thu': 0, 'Fri': 0, 'Sat': 0 };
+        const pnlByAsset = {};
+        let totalWinsPnl = 0, winCount = 0, totalLossesPnl = 0, lossCount = 0;
+        const dayMap = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+
+        tradeHistory.forEach(trade => {
+            const tradeDate = new Date(trade.time);
+            if (isNaN(tradeDate.getTime())) return;
+            
+            const yearMonth = `${tradeDate.getFullYear()}-${(tradeDate.getMonth() + 1).toString().padStart(2, '0')}`;
+            const fullDate = `${yearMonth}-${tradeDate.getDate().toString().padStart(2, '0')}`;
+            monthlyData[yearMonth] = monthlyData[yearMonth] || { pnl: 0, volume: 0 };
+            monthlyData[yearMonth].pnl += (trade.pnl || 0);
+            monthlyData[yearMonth].volume += (trade.effectiveVolume || 0);
+            dailyData[fullDate] = dailyData[fullDate] || { pnl: 0, volume: 0, roiSum: 0, roiCount: 0 };
+            dailyData[fullDate].pnl += (trade.pnl || 0);
+            dailyData[fullDate].volume += (trade.effectiveVolume || 0);
+            dailyData[fullDate].roiSum += (trade.roi || 0);
+            dailyData[fullDate].roiCount++;
+
+            const dayOfWeek = dayMap[tradeDate.getDay()];
+            pnlByDay[dayOfWeek] += (trade.pnl || 0);
+
+            if (!pnlByAsset[trade.pair]) {
+                pnlByAsset[trade.pair] = { pnl: 0, wins: 0, losses: 0 };
+            }
+            pnlByAsset[trade.pair].pnl += (trade.pnl || 0);
+            if ((trade.pnl || 0) >= 0) {
+                pnlByAsset[trade.pair].wins++;
+                totalWinsPnl += trade.pnl;
+                winCount++;
+            } else {
+                pnlByAsset[trade.pair].losses++;
+                totalLossesPnl += trade.pnl;
+                lossCount++;
+            }
+        });
+
+        const sortedMonths = Object.keys(monthlyData).sort();
+        monthlyPnLChart.data.labels = sortedMonths;
+        monthlyPnLChart.data.datasets[0].data = sortedMonths.map(m => monthlyData[m].pnl);
+        monthlyVolumeChart.data.labels = sortedMonths;
+        monthlyVolumeChart.data.datasets[0].data = sortedMonths.map(m => monthlyData[m].volume);
+
+        const sortedDates = Object.keys(dailyData).sort();
+        dailyPnLChart.data.labels = sortedDates;
+        dailyPnLChart.data.datasets[0].data = sortedDates.map(d => dailyData[d].pnl);
+        dailyVolumeChart.data.labels = sortedDates;
+        dailyVolumeChart.data.datasets[0].data = sortedDates.map(d => dailyData[d].volume);
+        dailyRoiChart.data.labels = sortedDates;
+        dailyRoiChart.data.datasets[0].data = sortedDates.map(d => dailyData[d].roiCount > 0 ? dailyData[d].roiSum / dailyData[d].roiCount : 0);
+
+        discrepancyChart.data.labels = discrepancyHistory.map(e => new Date(e.time).toLocaleString());
+        discrepancyChart.data.datasets[0].data = discrepancyHistory.map(e => e.value);
+
+        const combinedLabels = [...new Set([...cumulativeBalanceHistory.map(e => e.time.split('T')[0]), ...projectedGrowthHistory.map(e => e.time.split('T')[0])])].sort();
+        projectedGrowthChart.data.labels = combinedLabels;
+        projectedGrowthChart.data.datasets[0].data = combinedLabels.map(date => {
+            const entry = projectedGrowthHistory.find(e => e.time.startsWith(date));
+            return entry ? entry.balance : null;
+        });
+        projectedGrowthChart.data.datasets[1].data = combinedLabels.map(date => {
+            const entry = cumulativeBalanceHistory.find(e => e.time.startsWith(date));
+            return entry ? entry.balance : null;
+        });
+        cumulativeBalanceChart.data.labels = cumulativeBalanceHistory.map(e => new Date(e.time).toLocaleString());
+        cumulativeBalanceChart.data.datasets[0].data = cumulativeBalanceHistory.map(e => e.balance);
+
+        pnlByDayChart.data.labels = Object.keys(pnlByDay);
+        pnlByDayChart.data.datasets[0].data = Object.values(pnlByDay);
+        pnlByDayChart.data.datasets[0].backgroundColor = Object.values(pnlByDay).map(pnl => pnl >= 0 ? 'rgba(75, 192, 192, 0.6)' : 'rgba(255, 99, 132, 0.6)');
+
+        const sortedAssets = Object.keys(pnlByAsset).sort((a, b) => pnlByAsset[b].pnl - pnlByAsset[a].pnl);
+        pnlByAssetChart.data.labels = sortedAssets;
+        pnlByAssetChart.data.datasets[0].data = sortedAssets.map(asset => pnlByAsset[asset].pnl);
+        pnlByAssetChart.data.datasets[1].data = sortedAssets.map(asset => {
+            const stats = pnlByAsset[asset];
+            const total = stats.wins + stats.losses;
+            return total > 0 ? (stats.wins / total) * 100 : 0;
+        });
+
+        const avgWin = winCount > 0 ? totalWinsPnl / winCount : 0;
+        const avgLoss = lossCount > 0 ? totalLossesPnl / lossCount : 0;
+        avgWinLossChart.data.labels = ['Average Win', 'Average Loss'];
+        avgWinLossChart.data.datasets[0].data = [avgWin, avgLoss];
+        avgWinLossChart.data.datasets[0].backgroundColor = ['rgba(75, 192, 192, 0.6)', 'rgba(255, 99, 132, 0.6)'];
+
+        [monthlyPnLChart, monthlyVolumeChart, dailyPnLChart, dailyVolumeChart, dailyRoiChart, discrepancyChart, cumulativeBalanceChart, projectedGrowthChart, pnlByDayChart, pnlByAssetChart, avgWinLossChart].forEach(chart => { if(chart) chart.update() });
+    }
+    
+    // --- Data Parsing & Handling ---
+    function displayTrades(trades) {
+        const tradeHistoryOutput = document.getElementById('tradeHistoryOutput');
+        tradeHistoryOutput.innerHTML = '';
+        if (trades.length === 0) {
+            tradeHistoryOutput.innerHTML = '<p class="text-center text-muted m-0">No trade data processed yet.</p>';
+            return;
+        }
+        [...trades].sort((a, b) => new Date(b.time) - new Date(a.time)).forEach(trade => {
+            const tradeDiv = document.createElement('div');
+            tradeDiv.classList.add('trade-entry');
+            tradeDiv.innerHTML = `
+                <div class="d-flex justify-content-between"><span>Pair:</span> <strong>${trade.pair || 'N/A'}</strong></div>
+                <div class="d-flex justify-content-between"><span>Time:</span> <small>${trade.time || 'N/A'}</small></div>
+                <div class="d-flex justify-content-between"><span>PNL:</span> <strong class="${(trade.pnl || 0) >= 0 ? 'positive' : 'negative'}">${formatCurrency(trade.pnl || 0)}</strong></div>
+                <div class="d-flex justify-content-between"><span>ROI:</span> <strong class="${(trade.pnl || 0) >= 0 ? 'positive' : 'negative'}">${formatDecimalPercentage(trade.roi || 0)}</strong></div>
+            `;
+            tradeHistoryOutput.appendChild(tradeDiv);
+        });
+    }
+
+    function parseTradeData(rawData) {
+        const patterns = {
+            pair: /^([A-Z]{2,5}\/[A-Z]{2,5})$/,
+            orderNo: /^Order No\.\s*(\d+)$/,
+            time: /^Time\s*(\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2})$/,
+            pnl: /^PNL\s*([+-]?[\d.]+)\s*USDT$/,
+            roi: /^ROI\s*≈?\s*([\d.]+)\s*%$/,
+            effectiveVolume: /^Effective trading volume\s*([\d.]+)\s*USDT$/
+        };
+        const tradeBlocks = rawData.replace(/\r\n/g, '\n').split(/\n\n+/);
+        const parsedTrades = [];
+
+        tradeBlocks.forEach(block => {
+            const trade = {};
+            const lines = block.split('\n').map(cleanLine).filter(Boolean);
+            lines.forEach(line => {
+                for (const key in patterns) {
+                    const match = line.match(patterns[key]);
+                    if (match) {
+                        trade[key] = key.match(/pnl|roi|effectiveVolume/) ? parseFloat(match[1]) : match[1];
+                        return;
+                    }
+                }
+            });
+            if (trade.pair && trade.time && trade.orderNo && !isNaN(trade.pnl)) {
+                parsedTrades.push(trade);
+            }
+        });
+        return parsedTrades;
+    }
+
+    function handleNewParsedTrades(newTrades) {
+        const existingOrderNos = new Set(tradeHistory.map(t => t.orderNo));
+        const uniqueNewTrades = newTrades.filter(t => !existingOrderNos.has(t.orderNo));
+
+        if (uniqueNewTrades.length > 0) {
+            const lastNewTrade = uniqueNewTrades[uniqueNewTrades.length - 1];
+            if(lastNewTrade.pnl > 0) playSound('win');
+            if(lastNewTrade.pnl < 0) playSound('loss');
+
+            tradeHistory.push(...uniqueNewTrades);
+            tradeHistory.sort((a, b) => new Date(a.time) - new Date(b.time));
+            
+            document.getElementById('tradeDataInput').value = '';
+            displayTrades(tradeHistory);
+            updateAllMetrics();
+        } else {
+            console.log("No new trades found. The pasted data might be duplicates.");
+        }
+    }
+
+    // --- Modal & Data I/O ---
+    function showSetupModal() { if(setupModal) { updateSetupModalContent(); setupModal.show(); } }
+    function hideSetupModal() { if(setupModal) setupModal.hide(); localStorage.setItem('hasSeenSetup', 'true'); updateUiFromState(); updateAllMetrics(); }
+    function updateSetupModalContent() {
+        const step = setupSteps[currentSetupStep];
+        document.getElementById('setupModalLabel').textContent = step.title;
+        document.getElementById('setupModalBody').innerHTML = step.body();
+        document.getElementById('currentStepNumber').textContent = currentSetupStep + 1;
+        document.getElementById('totalStepsNumber').textContent = setupSteps.length;
+        document.getElementById('setupPrevButton').disabled = currentSetupStep === 0;
+        document.getElementById('setupNextButton').style.display = currentSetupStep === setupSteps.length - 1 ? 'none' : 'inline-block';
+        document.getElementById('setupStartButton').style.display = currentSetupStep === setupSteps.length - 1 ? 'inline-block' : 'none';
+        if (step.postRender) step.postRender();
+    }
+    function resetAllData() { localStorage.clear(); loadState({}); currentSetupStep = 0; showSetupModal(); }
+    function exportData() {
+        const allData = JSON.parse(localStorage.getItem('tradeTrackerData'));
+        if (!allData) {
+            console.error("No data available to export.");
+            return;
+        }
+
+        const dataStr = JSON.stringify(allData, null, 2);
+        const dataBlob = new Blob([dataStr], {type: "application/json"});
+        const url = URL.createObjectURL(dataBlob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `trade_tracker_backup_${new Date().toISOString().split('T')[0]}.json`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        console.log("Data exported successfully.");
+    }
+
+    function importData() {
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = '.json,application/json';
+        input.onchange = e => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                try {
+                    const importedData = JSON.parse(event.target.result);
+                    if (importedData && typeof importedData === 'object' && importedData.appSettings && importedData.tradeHistory) {
+                        loadState(importedData);
+                        saveState();
+                        displayTrades(tradeHistory);
+                        updateAllMetrics();
+                        console.log("Data imported successfully!");
+                    } else {
+                        throw new Error("Invalid or corrupted data file.");
+                    }
+                } catch (error) {
+                    console.error("Failed to import data:", error);
+                }
+            };
+            reader.readAsText(file);
+        };
+        input.click();
+    }
+    
+    // NEW: Fetch exchange rate function
+    async function fetchExchangeRate() {
+        try {
+            const response = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=tether&vs_currencies=php');
+            if (!response.ok) throw new Error('Network response was not ok');
+            const data = await response.json();
+            const rate = data.tether.php;
+            if (rate) {
+                appSettings.usdtPhpRate = rate;
+                console.log(`Successfully fetched USDT/PHP rate: ${rate}`);
+            }
+        } catch (error) {
+            console.error("Could not fetch live exchange rate, using saved value.", error);
+        }
+    }
+
+    // --- Main DOMContentLoaded Event Listener ---
+    document.addEventListener('DOMContentLoaded', async () => { // Made async
+        setupModal = new bootstrap.Modal(document.getElementById('setupModal'));
+        
+        // Event Listeners
+        document.querySelectorAll('input[type="number"], select').forEach(el => el.addEventListener('input', updateAllMetrics));
+        
+        const schedulePlannerInput = document.getElementById('schedulePlannerInput');
+        if (schedulePlannerInput) {
+            schedulePlannerInput.addEventListener('input', (e) => { appSettings.schedulePlanner = e.target.value; saveState(); });
+        }
+        
+        document.getElementById('projectionMethodSelect').addEventListener('change', (e) => { appSettings.selectedProjectionMethod = e.target.value; toggleProjectionInputs(e.target.value); updateAllMetrics(); });
+        document.getElementById('processDataButton').addEventListener('click', () => handleNewParsedTrades(parseTradeData(document.getElementById('tradeDataInput').value)));
+        document.getElementById('themeToggle').addEventListener('click', () => { appSettings.theme = appSettings.theme === 'dark' ? 'light' : 'dark'; document.documentElement.setAttribute('data-bs-theme', appSettings.theme); saveState(); });
+        document.getElementById('resetDataButtonBottom').addEventListener('click', resetAllData);
+        document.getElementById('exportDataButton').addEventListener('click', exportData);
+        document.getElementById('importDataButton').addEventListener('click', importData);
+        
+        // Modal Navigation
+        document.getElementById('setupNextButton').addEventListener('click', () => { if (setupSteps[currentSetupStep].save) setupSteps[currentSetupStep].save(); if (currentSetupStep < setupSteps.length - 1) { currentSetupStep++; updateSetupModalContent(); } });
+        document.getElementById('setupPrevButton').addEventListener('click', () => { if (setupSteps[currentSetupStep].save) setupSteps[currentSetupStep].save(); if (currentSetupStep > 0) { currentSetupStep--; updateSetupModalContent(); } });
+        document.getElementById('setupStartButton').addEventListener('click', () => { if (setupSteps[currentSetupStep].save) setupSteps[currentSetupStep].save(); hideSetupModal(); });
+
+        // Collapse State Saving
+        document.querySelectorAll('.collapse').forEach(el => {
+            el.addEventListener('show.bs.collapse', e => { const card = e.target.closest('.card'); if(card) { cardStates[card.id] = 'expanded'; saveState(); } });
+            el.addEventListener('hide.bs.collapse', e => { const card = e.target.closest('.card'); if(card) { cardStates[card.id] = 'collapsed'; saveState(); } });
+        });
+
+        // Initial Load Sequence
+        initializeCharts();
+        loadState(); // Load saved data first
+        await fetchExchangeRate(); // Then fetch live data, overwriting the rate if successful
+        displayTrades(tradeHistory);
+        updateAllMetrics(); // Recalculate with potentially new rate
+
+        if (!localStorage.getItem('tradeTrackerData')) {
+            currentSetupStep = 0;
+            showSetupModal();
+        }
+
+        new Sortable(document.getElementById('card-container'), { animation: 150, handle: '.card-header' });
+    });
+    </script>
 </body>
 </html>
