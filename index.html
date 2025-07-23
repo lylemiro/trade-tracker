@@ -443,7 +443,8 @@
                         <label>
                             <input type="radio" name="projectionMethod" value="percent" id="projectionMethodPercent">
                             By % Gain Per Trade (e.g., 1% of total balance)
-                        </label><br>
+                        </label>
+<Br>
                         <label>
                             <input type="radio" name="projectionMethod" value="fixedRoi" id="projectionMethodFixedRoi">
                             By Fixed Trade Amt & ROI (e.g., 70% ROI on $3)
@@ -459,20 +460,26 @@
                     </div>
 
                     <div id="percentProjectionInputs" style="display: none;">
-                        <div class="card-row">
-                            <span>Projected Gain Per Trade (%):</span>
-                            <input type="number" id="projectedGainPerTradeInput" value="1" step="0.1">
+                        <div class="card-group-subsection">
+                            <h5>% Gain Projection Details</h5>
+                            <div class="card-row">
+                                <span>Projected Gain Per Trade (%):</span>
+                                <input type="number" id="projectedGainPerTradeInput" value="1" step="0.1">
+                            </div>
                         </div>
                     </div>
 
                     <div id="fixedRoiProjectionInputs" style="display: none;">
-                        <div class="card-row">
-                            <span>Projected Trade Amount (USDT):</span>
-                            <input type="number" id="projectedTradeAmountInput" value="3.00" step="0.01">
-                        </div>
-                        <div class="card-row">
-                            <span>Projected ROI Per Trade (%):</span>
-                            <input type="number" id="projectedRoiPerTradeInput" value="70" step="1">
+                        <div class="card-group-subsection">
+                            <h5>Fixed Amount & ROI Projection Details</h5>
+                            <div class="card-row">
+                                <span>Projected Trade Amount (USDT):</span>
+                                <input type="number" id="projectedTradeAmountInput" value="3.00" step="0.01">
+                            </div>
+                            <div class="card-row">
+                                <span>Projected ROI Per Trade (%):</span>
+                                <input type="number" id="projectedRoiPerTradeInput" value="70" step="1">
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -494,6 +501,18 @@
                      <div class="card-row">
                         <span><strong>Days Remaining (Selected Projection):</strong></span>
                         <span id="daysRemainingCompounding" class="value"></span>
+                    </div>
+                    <div class="card-row">
+                        <span>Target Trading Volume (USDT):</span>
+                        <input type="number" id="targetTradingVolumeInput" value="300" step="1">
+                    </div>
+                    <div class="card-row">
+                        <span><strong>Current Total Trading Volume:</strong></span>
+                        <span id="currentTotalTradingVolume" class="value"></span>
+                    </div>
+                    <div class="card-row">
+                        <span><strong>Days Remaining (Volume Target):</strong></span>
+                        <span id="daysRemainingVolumeTarget" class="value"></span>
                     </div>
                     <div class="card-row">
                         <span><strong>Wallet Balance Needed:</strong></span>
@@ -735,68 +754,8 @@ Effective trading volume 3.19 USDT
 
 
     <script>
-        // --- DOM Elements ---
-        const usdtPhpRateInput = document.getElementById('usdtPhpRate');
-        const targetMonthlyIncomePhpInput = document.getElementById('targetMonthlyIncomePhp');
-        const startingBalanceUsdtInput = document.getElementById('startingBalanceUsdt');
-        const projectedGainPerTradeInput = document.getElementById('projectedGainPerTradeInput');
-        const tradesPerDayInput = document.getElementById('tradesPerDayInput');
-        const projectionPeriodDaysInput = document.getElementById('projectionPeriodDaysInput');
-        const projectedTradeAmountInput = document.getElementById('projectedTradeAmountInput');
-        const projectedRoiPerTradeInput = document.getElementById('projectedRoiPerTradeInput');
-
-        const projectionMethodPercentRadio = document.getElementById('projectionMethodPercent');
-        const projectionMethodFixedRoiRadio = document.getElementById('projectionMethodFixedRoi');
-        const percentProjectionInputsDiv = document.getElementById('percentProjectionInputs');
-        const fixedRoiProjectionInputsDiv = document.getElementById('fixedRoiProjectionInputs');
-
-        const targetBalanceCombinedEl = document.getElementById('targetBalanceCombined');
-        const totalGainsCombinedEl = document.getElementById('totalGainsCombined');
-        const daysRemainingLinearEl = document.getElementById('daysRemainingLinear');
-        const daysRemainingCompoundingEl = document.getElementById('daysRemainingCompounding');
-        const walletBalanceNeededCombinedEl = document.getElementById('walletBalanceNeededCombined');
-        const previousBalanceCombinedEl = document.getElementById('previousBalanceCombined');
-        const calculatedBalanceCombinedEl = document.getElementById('calculatedBalanceCombined');
-        const actualCurrentBalanceUsdtInput = document.getElementById('actualCurrentBalanceUsdtInput');
-        const discrepancyCombinedEl = document.getElementById('discrepancyCombined');
-
-        const currentGainUsdtEl = document.getElementById('currentGainUsdt');
-        const currentGainPhpEl = document.getElementById('currentGainPhp');
-        const currentRoiEl = document.getElementById('currentRoi');
-        const previousGainUsdtEl = document.getElementById('previousGainUsdt');
-        const gainDifferenceUsdtEl = document.getElementById('gainDifferenceUsdt');
-        const gainDifferencePhpEl = document.getElementById('gainDifferencePhp');
-        const lastTradeAmountUsdtEl = document.getElementById('lastTradeAmountUsdt');
-        const tradeAmountGrowthEl = document.getElementById('tradeAmountGrowth');
-        const currentWinStreakEl = document.getElementById('currentWinStreak');
-        const longestWinStreakEl = document.getElementById('longestWinStreak');
-        const currentLossStreakEl = document.getElementById('currentLossStreak');
-        const longestLossStreakEl = document.getElementById('longestLossStreak');
-        const totalTradesEl = document.getElementById('totalTrades');
-        const totalWinsEl = document.getElementById('totalWins');
-        const totalLossesEl = document.getElementById('totalLosses');
-        const winRateEl = document.getElementById('winRate');
-        const tradeDataInput = document.getElementById('tradeDataInput');
-        const processDataButton = document.getElementById('processDataButton');
-        const themeToggleButton = document.getElementById('themeToggle');
-        const resetDataButtonBottom = document.getElementById('resetDataButtonBottom');
-        const schedulePlannerInput = document.getElementById('schedulePlannerInput');
-        const tradeHistoryOutput = document.getElementById('tradeHistoryOutput');
-        const winSound = document.getElementById('winSound');
-        const lossSound = document.getElementById('lossSound');
-
-        // Setup Modal Elements
-        const setupModalOverlay = document.getElementById('setupModalOverlay');
-        const setupModalTitle = document.getElementById('setupModalTitle');
-        const setupModalBody = document.getElementById('setupModalBody');
-        const setupPrevButton = document.getElementById('setupPrevButton');
-        const setupNextButton = document.getElementById('setupNextButton');
-        const setupStartButton = document.getElementById('setupStartButton');
-        const currentStepNumber = document.getElementById('currentStepNumber');
-        const totalStepsNumber = document.getElementById('totalStepsNumber');
-
-
-        // --- Chart Instances (Declare globally so they can be accessed/updated) ---
+        // --- GLOBAL VARIABLES (Accessible throughout the script) ---
+        // Chart Instances
         let monthlyPnLChart = null;
         let monthlyVolumeChart = null;
         let dailyRoiChart = null;
@@ -806,7 +765,7 @@ Effective trading volume 3.19 USDT
         let cumulativeBalanceChart = null;
         let projectedGrowthChart = null;
 
-        // --- Data Storage (will be loaded/saved to localStorage) ---
+        // Data Storage
         const DEFAULT_APP_SETTINGS = {
             usdtPhpRate: 57.11,
             targetMonthlyIncomePhp: 50000,
@@ -844,7 +803,7 @@ Effective trading volume 3.19 USDT
         let cumulativeBalanceHistory = [];
         let projectedGrowthHistory = [];
 
-        // --- Setup Modal State ---
+        // Setup Modal State
         let currentSetupStep = 0;
         const setupSteps = [
             {
@@ -863,6 +822,7 @@ Effective trading volume 3.19 USDT
                         <li>Adjust the <strong>'USDT/PHP Rate'</strong> and <strong>'Target Monthly Income (₱)'</strong> as needed.</li>
                         <li>Select your preferred **'Projection Method'** using the radio buttons.</li>
                         <li>Based on your selected method, adjust the corresponding inputs (e.g., 'Projected Gain Per Trade (%):' or 'Projected Trade Amount (USDT):'). Also set 'Trades Per Day' and 'Projection Period (Days)'.</li>
+                        <li>Set your <strong>'Target Trading Volume (USDT)'</strong> if you have a specific volume requirement (e.g., for bonus cashout).</li>
                     </ol>
                 `
             },
@@ -911,7 +871,7 @@ Effective trading volume 3.19 USDT
         ];
 
 
-        // --- Helper Functions ---
+        // --- Helper Functions (Explicitly global for clarity and to avoid ReferenceErrors) ---
 
         function cleanLine(line) {
             return line.replace(/[\u00A0\u200B-\u200D\uFEFF]/g, ' ')
@@ -927,8 +887,12 @@ Effective trading volume 3.19 USDT
             return `₱${amount.toFixed(2)}`;
         }
 
-        function formatPercentage(value) {
+        function formatDecimalPercentage(value) { // Renamed function
             return `${value.toFixed(2)} %`;
+        }
+
+        function formatPercentage(value) { // Added this missing function
+            return `${value.toFixed(2)}%`;
         }
 
         function formatCombinedCurrency(usdtAmount, phpRate) {
@@ -937,14 +901,35 @@ Effective trading volume 3.19 USDT
         }
 
         function playSound(type) {
+            const winSound = document.getElementById('winSound');
+            const lossSound = document.getElementById('lossSound');
             if (type === 'win') {
-                winSound.play().catch(e => console.error("Error playing win sound:", e));
+                if (winSound) winSound.play().catch(e => console.error("Error playing win sound:", e));
+                else console.warn("Win sound element not found.");
             } else if (type === 'loss') {
-                lossSound.play().catch(e => console.error("Error playing loss sound:", e));
+                if (lossSound) lossSound.play().catch(e => console.error("Error playing loss sound:", e));
+                else console.warn("Loss sound element not found.");
             }
         }
 
-        // --- Local Storage Management ---
+        // Function to toggle visibility of projection method inputs
+        function toggleProjectionInputs(method) {
+            const percentInputs = document.getElementById('percentProjectionInputs');
+            const fixedRoiInputs = document.getElementById('fixedRoiProjectionInputs');
+
+            if (method === 'percent') {
+                percentInputs.style.display = 'block';
+                fixedRoiInputs.style.display = 'none';
+            } else if (method === 'fixedRoi') {
+                percentInputs.style.display = 'none';
+                fixedRoiInputs.style.display = 'block';
+            } else {
+                percentInputs.style.display = 'none';
+                fixedRoiInputs.style.display = 'none';
+            }
+        }
+
+        // --- Local Storage Management (Explicitly global) ---
 
         function saveState() {
             localStorage.setItem('tradeHistory', JSON.stringify(tradeHistory));
@@ -997,83 +982,82 @@ Effective trading volume 3.19 USDT
                 projectedGrowthHistory = [];
             }
 
-
-            usdtPhpRateInput.value = appSettings.usdtPhpRate;
-            targetMonthlyIncomePhpInput.value = appSettings.targetMonthlyIncomePhp;
-            startingBalanceUsdtInput.value = appSettings.startingBalanceUsdt;
-            projectedGainPerTradeInput.value = appSettings.projectedGainPerTrade;
-            tradesPerDayInput.value = appSettings.tradesPerDay;
-            projectionPeriodDaysInput.value = appSettings.projectionPeriodDays;
-            projectedTradeAmountInput.value = appSettings.projectedTradeAmount;
-            projectedRoiPerTradeInput.value = appSettings.projectedRoiPerTrade;
-            actualCurrentBalanceUsdtInput.value = balanceData.actualBalanceUsdt;
-            schedulePlannerInput.value = appSettings.schedulePlanner;
+            // Update input values from loaded/default settings - CORRECTED IDs HERE
+            document.getElementById('usdtPhpRate').value = appSettings.usdtPhpRate;
+            document.getElementById('targetMonthlyIncomePhp').value = appSettings.targetMonthlyIncomePhp;
+            document.getElementById('startingBalanceUsdt').value = appSettings.startingBalanceUsdt;
+            document.getElementById('projectedGainPerTradeInput').value = appSettings.projectedGainPerTrade;
+            document.getElementById('tradesPerDayInput').value = appSettings.tradesPerDay;
+            document.getElementById('projectionPeriodDaysInput').value = appSettings.projectionPeriodDays;
+            document.getElementById('projectedTradeAmountInput').value = appSettings.projectedTradeAmount;
+            document.getElementById('projectedRoiPerTradeInput').value = appSettings.projectedRoiPerTrade;
+            document.getElementById('targetTradingVolumeInput').value = appSettings.targetTradingVolume;
+            document.getElementById('actualCurrentBalanceUsdtInput').value = balanceData.actualBalanceUsdt;
+            document.getElementById('schedulePlannerInput').value = appSettings.schedulePlanner;
             document.documentElement.setAttribute('data-theme', appSettings.theme);
 
             // Set selected radio button on load and toggle inputs
             const selectedRadio = document.querySelector(`input[name="projectionMethod"][value="${appSettings.selectedProjectionMethod}"]`);
             if (selectedRadio) {
                 selectedRadio.checked = true;
-                toggleProjectionInputs(appSettings.selectedProjectionMethod); // Show/hide relevant inputs
-            } else { // Default to percent if none selected/found
-                document.getElementById('projectionMethodPercent').checked = true;
-                toggleProjectionInputs('percent');
             }
+            // Call toggleProjectionInputs after all initial inputs are set
+            toggleProjectionInputs(appSettings.selectedProjectionMethod);
         }
 
-        // --- Data Calculation & Update ---
+        // --- Data Calculation & Update (explicitly global) ---
 
         function updateAllMetrics() {
-            const usdtPhpRate = parseFloat(usdtPhpRateInput.value);
-            const targetMonthlyIncomePhp = parseFloat(targetMonthlyIncomePhpInput.value);
-            const startingBalanceUsdt = parseFloat(startingBalanceUsdtInput.value);
-            const projectedGainPerTrade = parseFloat(projectedGainPerTradeInput.value);
-            const tradesPerDay = parseInt(tradesPerDayInput.value);
-            const projectionPeriodDays = parseInt(projectionPeriodDaysInput.value);
-            const projectedTradeAmount = parseFloat(projectedTradeAmountInput.value);
-            const projectedRoiPerTrade = parseFloat(projectedRoiPerTradeInput.value);
-            const actualBalanceUsdt = parseFloat(actualCurrentBalanceUsdtInput.value);
+            const usdtPhpRate = parseFloat(document.getElementById('usdtPhpRate').value);
+            const targetMonthlyIncomePhp = parseFloat(document.getElementById('targetMonthlyIncomePhp').value);
+            const startingBalanceUsdt = parseFloat(document.getElementById('startingBalanceUsdt').value);
+            const projectedGainPerTrade = parseFloat(document.getElementById('projectedGainPerTradeInput').value);
+            const tradesPerDay = parseInt(document.getElementById('tradesPerDayInput').value);
+            const projectionPeriodDays = parseInt(document.getElementById('projectionPeriodDaysInput').value);
+            const projectedTradeAmount = parseFloat(document.getElementById('projectedTradeAmountInput').value);
+            const projectedRoiPerTrade = parseFloat(document.getElementById('projectedRoiPerTradeInput').value);
+            const targetTradingVolume = parseFloat(document.getElementById('targetTradingVolumeInput').value);
+            const actualBalanceUsdt = parseFloat(document.getElementById('actualCurrentBalanceUsdtInput').value);
 
-            if (isNaN(usdtPhpRate) || isNaN(targetMonthlyIncomePhp) || isNaN(startingBalanceUsdt) || isNaN(projectedGainPerTrade) || isNaN(tradesPerDay) || isNaN(projectionPeriodDays) || isNaN(projectedTradeAmount) || isNaN(projectedRoiPerTrade) || isNaN(actualBalanceUsdt)) {
-                 console.warn("Invalid numerical input. Please check all input fields and ensure they are numbers.");
-                 return;
+            if (isNaN(usdtPhpRate) || isNaN(targetMonthlyIncomePhp) || isNaN(startingBalanceUsdt) || isNaN(projectedGainPerTrade) || isNaN(tradesPerDay) || isNaN(projectionPeriodDays) || isNaN(projectedTradeAmount) || isNaN(projectedRoiPerTrade) || isNaN(targetTradingVolume) || isNaN(actualBalanceUsdt)) {
+                   console.warn("Invalid numerical input. Please check all input fields and ensure they are numbers.");
+                   return;
             }
 
-            // --- Calculate Cumulative Balance for Chart ---
+            // Reset cumulative balance history for recalculation
             cumulativeBalanceHistory = [];
             let runningBalance = startingBalanceUsdt;
+            
+            // Add initial balance point if no trades or before first trade
             if (tradeHistory.length > 0) {
-                const earliestTradeTime = tradeHistory[0].time;
-                cumulativeBalanceHistory.push({ time: earliestTradeTime, balance: startingBalanceUsdt });
-
-                tradeHistory.forEach(trade => {
-                    runningBalance += (trade.pnl || 0);
-                    cumulativeBalanceHistory.push({ time: trade.time, balance: runningBalance });
-                });
+                // Ensure starting point is the actual starting balance on the date of the first trade (or earlier)
+                cumulativeBalanceHistory.push({ time: tradeHistory[0].time, balance: startingBalanceUsdt });
             } else {
                 const now = new Date();
-                const year = now.getFullYear();
-                const month = (now.getMonth() + 1).toString().padStart(2, '0');
-                const day = now.getDate().toString().padStart(2, '0');
-                const hours = now.getHours().toString().padStart(2, '0');
-                const minutes = now.getMinutes().toString().padStart(2, '0');
-                const seconds = now.getSeconds().toString().padStart(2, '0');
-                const currentTimeFormatted = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+                const currentTimeFormatted = `${now.getFullYear()}-${(now.getMonth() + 1).toString().padStart(2, '0')}-${now.getDate().toString().padStart(2, '0')} ${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}:${now.getSeconds().toString().padStart(2, '0')}`;
                 cumulativeBalanceHistory.push({ time: currentTimeFormatted, balance: startingBalanceUsdt });
             }
 
-            // --- Calculate Projected Compounding Growth (for selected method) ---
-            projectedGrowthHistory = []; // Clear for recalculation
+            tradeHistory.forEach(trade => {
+                runningBalance += (trade.pnl || 0);
+                // Only add a new point if the balance changed or it's a new time entry
+                const lastEntry = cumulativeBalanceHistory[cumulativeBalanceHistory.length - 1];
+                if (lastEntry && (lastEntry.balance !== runningBalance || lastEntry.time !== trade.time)) {
+                     cumulativeBalanceHistory.push({ time: trade.time, balance: runningBalance });
+                }
+            });
+
+            projectedGrowthHistory = [];
             let currentProjectedBalanceForChart = startingBalanceUsdt;
-            
             if (cumulativeBalanceHistory.length > 0) {
+                // Start projection from the last calculated cumulative balance
                 currentProjectedBalanceForChart = cumulativeBalanceHistory[cumulativeBalanceHistory.length - 1].balance;
             }
 
             const selectedMethod = appSettings.selectedProjectionMethod;
 
-            let dailyCompoundingFactor = 1; // Used for % Gain method
-            let dailyPnlFixedRoi = 0;      // Used for Fixed ROI method
+            let dailyCompoundingFactor = 1;
+            let dailyPnlFixedRoi = 0;
 
             if (selectedMethod === 'percent') {
                 dailyCompoundingFactor = (1 + (projectedGainPerTrade / 100)) ** tradesPerDay;
@@ -1082,30 +1066,47 @@ Effective trading volume 3.19 USDT
             }
 
             let projectionStartDate = new Date();
-             if (cumulativeBalanceHistory.length > 0) {
+            if (cumulativeBalanceHistory.length > 0) {
+                // Start projecting from the day after the last logged cumulative balance
                 projectionStartDate = new Date(cumulativeBalanceHistory[cumulativeBalanceHistory.length - 1].time);
+                projectionStartDate.setDate(projectionStartDate.getDate() + 1); // Start from next day
             } else {
-                projectionStartDate = new Date();
+                projectionStartDate = new Date(); // If no trade history, start from today
             }
 
-            for (let i = 0; i <= projectionPeriodDays; i++) {
+            // Add today's calculated balance as the starting point for projection if it's not already there
+            // This is crucial for the projection to align with the current actual state
+            const today = new Date();
+            const todayFormatted = `${today.getFullYear()}-${(today.getMonth() + 1).toString().padStart(2, '0')}-${today.getDate().toString().padStart(2, '0')}`;
+            const lastCumBalanceTime = cumulativeBalanceHistory.length > 0 ? cumulativeBalanceHistory[cumulativeBalanceHistory.length - 1].time.substring(0, 10) : '';
+
+            if (lastCumBalanceTime !== todayFormatted) {
+                 // If last cumulative balance is not from today, add it as a starting point for projection
+                projectedGrowthHistory.push({ time: todayFormatted, balance: balanceData.calculatedBalanceUsdt });
+                currentProjectedBalanceForChart = balanceData.calculatedBalanceUsdt; // Set the starting point for daily projection
+            } else if (cumulativeBalanceHistory.length > 0) {
+                // If last cumulative balance is from today, use that as starting point
+                projectedGrowthHistory.push({ time: lastCumBalanceTime, balance: cumulativeBalanceHistory[cumulativeBalanceHistory.length - 1].balance });
+                currentProjectedBalanceForChart = cumulativeBalanceHistory[cumulativeBalanceHistory.length - 1].balance;
+            }
+
+
+            for (let i = 0; i < projectionPeriodDays; i++) { // Loop for projectionPeriodDays days
                 const projectDate = new Date(projectionStartDate);
                 projectDate.setDate(projectionStartDate.getDate() + i);
                 const dateFormatted = `${projectDate.getFullYear()}-${(projectDate.getMonth() + 1).toString().padStart(2, '0')}-${projectDate.getDate().toString().padStart(2, '0')}`;
-                
-                projectedGrowthHistory.push({ time: dateFormatted, balance: currentProjectedBalanceForChart });
                 
                 if (selectedMethod === 'percent') {
                     currentProjectedBalanceForChart *= dailyCompoundingFactor;
                 } else if (selectedMethod === 'fixedRoi') {
                     currentProjectedBalanceForChart += dailyPnlFixedRoi;
                 }
+                projectedGrowthHistory.push({ time: dateFormatted, balance: currentProjectedBalanceForChart });
             }
-
 
             let totalPnLFromTrades = 0;
             if (tradeHistory.length > 0) {
-                 totalPnLFromTrades = tradeHistory.reduce((sum, trade) => sum + (trade.pnl || 0), 0);
+                  totalPnLFromTrades = tradeHistory.reduce((sum, trade) => sum + (trade.pnl || 0), 0);
             }
             balanceData.calculatedBalanceUsdt = startingBalanceUsdt + totalPnLFromTrades;
 
@@ -1134,11 +1135,12 @@ Effective trading volume 3.19 USDT
             }
 
             const totalGainsUsdt = balanceData.calculatedBalanceUsdt - startingBalanceUsdt;
-            const targetBalanceUsdt = startingBalanceUsdt + (targetMonthlyIncomePhp / usdtPhpRate);
+            const targetMonthlyIncomeUsdt = targetMonthlyIncomePhp / usdtPhpRate; // Calculate once
+            const targetBalanceUsdt = startingBalanceUsdt + targetMonthlyIncomeUsdt;
             const walletBalanceNeeded = targetBalanceUsdt - balanceData.calculatedBalanceUsdt;
             
             // Days Remaining (Linear Target)
-            const dailyTargetIncomeUsdt = (targetMonthlyIncomePhp / usdtPhpRate / 30);
+            const dailyTargetIncomeUsdt = (targetMonthlyIncomeUsdt / 30);
             const remainingToTargetUsdtLinear = Math.max(0, targetBalanceUsdt - balanceData.calculatedBalanceUsdt);
             const daysRemainingLinear = dailyTargetIncomeUsdt > 0 ? remainingToTargetUsdtLinear / dailyTargetIncomeUsdt : Infinity;
 
@@ -1166,32 +1168,50 @@ Effective trading volume 3.19 USDT
                 daysRemainingCompounding = 0;
             }
 
+            // --- Days Remaining (Trading Volume Target) ---
+            let currentTotalTradingVolume = 0;
+            if (tradeHistory.length > 0) {
+                currentTotalTradingVolume = tradeHistory.reduce((sum, trade) => sum + (trade.effectiveVolume || 0), 0);
+            }
+            let daysRemainingVolumeTarget = 'N/A';
+            const remainingVolumeNeeded = Math.max(0, targetTradingVolume - currentTotalTradingVolume);
+            const projectedDailyTradingVolume = projectedTradeAmount * tradesPerDay;
 
-            targetBalanceCombinedEl.textContent = formatCombinedCurrency(targetBalanceUsdt, usdtPhpRate);
-            totalGainsCombinedEl.textContent = formatCombinedCurrency(totalGainsUsdt, usdtPhpRate);
-            totalGainsCombinedEl.classList.toggle('positive', totalGainsUsdt >= 0);
-            totalGainsCombinedEl.classList.toggle('negative', totalGainsUsdt < 0);
-
-            daysRemainingLinearEl.textContent = isFinite(daysRemainingLinear) ? daysRemainingLinear.toFixed(2) + ' days' : 'N/A';
-            daysRemainingCompoundingEl.textContent = (typeof daysRemainingCompounding === 'number' && isFinite(daysRemainingCompounding)) ? daysRemainingCompounding.toFixed(2) + ' days' : 'N/A';
+            if (targetTradingVolume > 0 && remainingVolumeNeeded > 0 && projectedDailyTradingVolume > 0) {
+                daysRemainingVolumeTarget = remainingVolumeNeeded / projectedDailyTradingVolume;
+            } else if (targetTradingVolume <= 0 || remainingVolumeNeeded <= 0) {
+                daysRemainingVolumeTarget = 0;
+            }
             
-            walletBalanceNeededCombinedEl.textContent = formatCombinedCurrency(walletBalanceNeeded, usdtPhpRate);
-            walletBalanceNeededCombinedEl.classList.toggle('positive', walletBalanceNeeded <= 0);
-            walletBalanceNeededCombinedEl.classList.toggle('negative', walletBalanceNeeded > 0);
+            document.getElementById('targetBalanceCombined').textContent = formatCombinedCurrency(targetBalanceUsdt, usdtPhpRate);
+            document.getElementById('totalGainsCombined').textContent = formatCombinedCurrency(totalGainsUsdt, usdtPhpRate);
+            document.getElementById('totalGainsCombined').classList.toggle('positive', totalGainsUsdt >= 0);
+            document.getElementById('totalGainsCombined').classList.toggle('negative', totalGainsUsdt < 0);
 
-            previousBalanceCombinedEl.textContent = formatCombinedCurrency(balanceData.previousBalanceUsdt, usdtPhpRate);
-            previousBalanceCombinedEl.classList.toggle('positive', balanceData.previousBalanceUsdt >= 0);
-            previousBalanceCombinedEl.classList.toggle('negative', balanceData.previousBalanceUsdt < 0);
+            document.getElementById('daysRemainingLinear').textContent = isFinite(daysRemainingLinear) ? daysRemainingLinear.toFixed(2) + ' days' : 'N/A';
+            document.getElementById('daysRemainingCompounding').textContent = (typeof daysRemainingCompounding === 'number' && isFinite(daysRemainingCompounding)) ? daysRemainingCompounding.toFixed(2) + ' days' : 'N/A';
+            
+            document.getElementById('currentTotalTradingVolume').textContent = formatCurrency(currentTotalTradingVolume);
+            document.getElementById('daysRemainingVolumeTarget').textContent = (typeof daysRemainingVolumeTarget === 'number' && isFinite(daysRemainingVolumeTarget)) ? daysRemainingVolumeTarget.toFixed(2) + ' days' : 'N/A';
 
-            calculatedBalanceCombinedEl.textContent = formatCombinedCurrency(balanceData.calculatedBalanceUsdt, usdtPhpRate);
-            calculatedBalanceCombinedEl.classList.toggle('positive', balanceData.calculatedBalanceUsdt >= 0);
-            calculatedBalanceCombinedEl.classList.toggle('negative', balanceData.calculatedBalanceUsdt < 0);
+
+            document.getElementById('walletBalanceNeededCombined').textContent = formatCombinedCurrency(walletBalanceNeeded, usdtPhpRate);
+            document.getElementById('walletBalanceNeededCombined').classList.toggle('positive', walletBalanceNeeded <= 0);
+            document.getElementById('walletBalanceNeededCombined').classList.toggle('negative', walletBalanceNeeded > 0);
+
+            document.getElementById('previousBalanceCombined').textContent = formatCombinedCurrency(balanceData.previousBalanceUsdt, usdtPhpRate);
+            document.getElementById('previousBalanceCombined').classList.toggle('positive', balanceData.previousBalanceUsdt >= 0);
+            document.getElementById('previousBalanceCombined').classList.toggle('negative', balanceData.previousBalanceUsdt < 0);
+
+            document.getElementById('calculatedBalanceCombined').textContent = formatCombinedCurrency(balanceData.calculatedBalanceUsdt, usdtPhpRate);
+            document.getElementById('calculatedBalanceCombined').classList.toggle('positive', balanceData.calculatedBalanceUsdt >= 0);
+            document.getElementById('calculatedBalanceCombined').classList.toggle('negative', balanceData.calculatedBalanceUsdt < 0);
 
 
             const discrepancyUsdt = actualBalanceUsdt - balanceData.calculatedBalanceUsdt;
-            discrepancyCombinedEl.textContent = formatCombinedCurrency(discrepancyUsdt, usdtPhpRate);
-            discrepancyCombinedEl.classList.toggle('positive', discrepancyUsdt >= 0);
-            discrepancyCombinedEl.classList.toggle('negative', discrepancyUsdt < 0);
+            document.getElementById('discrepancyCombined').textContent = formatCombinedCurrency(discrepancyUsdt, usdtPhpRate);
+            document.getElementById('discrepancyCombined').classList.toggle('positive', discrepancyUsdt >= 0);
+            document.getElementById('discrepancyCombined').classList.toggle('negative', discrepancyUsdt < 0);
             
             balanceData.actualBalanceUsdt = actualBalanceUsdt;
 
@@ -1219,34 +1239,34 @@ Effective trading volume 3.19 USDT
             const gainDifferencePhp = gainDifferenceUsdt * usdtPhpRate;
             const tradeAmountGrowth = lastTradeStats.lastTradeAmount - lastTradeStats.previousTradeAmount;
 
-            currentGainUsdtEl.textContent = formatCurrency(currentGainUsdt);
-            currentGainUsdtEl.classList.toggle('positive', currentGainUsdt >= 0);
-            currentGainUsdtEl.classList.toggle('negative', currentGainUsdt < 0);
+            document.getElementById('currentGainUsdt').textContent = formatCurrency(currentGainUsdt);
+            document.getElementById('currentGainUsdt').classList.toggle('positive', currentGainUsdt >= 0);
+            document.getElementById('currentGainUsdt').classList.toggle('negative', currentGainUsdt < 0);
 
-            currentGainPhpEl.textContent = formatPhp(currentGainPhp);
-            currentGainPhpEl.classList.toggle('positive', currentGainPhp >= 0);
-            currentGainPhpEl.classList.toggle('negative', currentGainPhp < 0);
+            document.getElementById('currentGainPhp').textContent = formatPhp(currentGainPhp);
+            document.getElementById('currentGainPhp').classList.toggle('positive', currentGainPhp >= 0);
+            document.getElementById('currentGainPhp').classList.toggle('negative', currentGainPhp < 0);
 
-            currentRoiEl.textContent = formatPercentage(lastTradeStats.currentRoi);
-            currentRoiEl.classList.toggle('positive', lastTradeStats.currentRoi >= 0);
-            currentRoiEl.classList.toggle('negative', lastTradeStats.currentRoi < 0);
+            document.getElementById('currentRoi').textContent = formatDecimalPercentage(lastTradeStats.currentRoi);
+            document.getElementById('currentRoi').classList.toggle('positive', lastTradeStats.currentRoi >= 0);
+            document.getElementById('currentRoi').classList.toggle('negative', lastTradeStats.currentRoi < 0);
 
-            previousGainUsdtEl.textContent = formatCurrency(previousGainUsdt);
-            previousGainUsdtEl.classList.toggle('positive', previousGainUsdt >= 0);
-            previousGainUsdtEl.classList.toggle('negative', previousGainUsdt < 0);
+            document.getElementById('previousGainUsdt').textContent = formatCurrency(previousGainUsdt);
+            document.getElementById('previousGainUsdt').classList.toggle('positive', previousGainUsdt >= 0);
+            document.getElementById('previousGainUsdt').classList.toggle('negative', previousGainUsdt < 0);
 
-            gainDifferenceUsdtEl.textContent = formatCurrency(gainDifferenceUsdt);
-            gainDifferenceUsdtEl.classList.toggle('positive', gainDifferenceUsdt >= 0);
-            gainDifferenceUsdtEl.classList.toggle('negative', gainDifferenceUsdt < 0);
+            document.getElementById('gainDifferenceUsdt').textContent = formatCurrency(gainDifferenceUsdt);
+            document.getElementById('gainDifferenceUsdt').classList.toggle('positive', gainDifferenceUsdt >= 0);
+            document.getElementById('gainDifferenceUsdt').classList.toggle('negative', gainDifferenceUsdt < 0);
 
-            gainDifferencePhpEl.textContent = formatPhp(gainDifferencePhp);
-            gainDifferencePhpEl.classList.toggle('positive', gainDifferencePhp >= 0);
-            gainDifferencePhpEl.classList.toggle('negative', gainDifferencePhp < 0);
+            document.getElementById('gainDifferencePhp').textContent = formatPhp(gainDifferencePhp);
+            document.getElementById('gainDifferencePhp').classList.toggle('positive', gainDifferencePhp >= 0);
+            document.getElementById('gainDifferencePhp').classList.toggle('negative', gainDifferencePhp < 0);
 
-            lastTradeAmountUsdtEl.textContent = formatCurrency(lastTradeStats.lastTradeAmount);
-            tradeAmountGrowthEl.textContent = formatCurrency(tradeAmountGrowth);
-            tradeAmountGrowthEl.classList.toggle('positive', tradeAmountGrowth >= 0);
-            tradeAmountGrowthEl.classList.toggle('negative', tradeAmountGrowth < 0);
+            document.getElementById('lastTradeAmountUsdt').textContent = formatCurrency(lastTradeStats.lastTradeAmount);
+            document.getElementById('tradeAmountGrowth').textContent = formatCurrency(tradeAmountGrowth);
+            document.getElementById('tradeAmountGrowth').classList.toggle('positive', tradeAmountGrowth >= 0);
+            document.getElementById('tradeAmountGrowth').classList.toggle('negative', tradeAmountGrowth < 0);
 
             let currentWin = 0;
             let longestWin = 0;
@@ -1269,20 +1289,20 @@ Effective trading volume 3.19 USDT
                 }
             });
 
-            currentWinStreakEl.textContent = currentWin;
-            longestWinStreakEl.textContent = longestWin;
-            currentLossStreakEl.textContent = currentLoss;
-            longestLossStreakEl.textContent = longestLoss;
-            totalTradesEl.textContent = tradeHistory.length;
-            totalWinsEl.textContent = wins;
-            totalLossesEl.textContent = losses;
-            winRateEl.textContent = tradeHistory.length > 0 ? formatPercentage((wins / tradeHistory.length) * 100) : '0%';
+            document.getElementById('currentWinStreak').textContent = currentWin;
+            document.getElementById('longestWinStreak').textContent = longestWin;
+            document.getElementById('currentLossStreak').textContent = currentLoss;
+            document.getElementById('longestLossStreak').textContent = longestLoss;
+            document.getElementById('totalTrades').textContent = tradeHistory.length;
+            document.getElementById('totalWins').textContent = wins;
+            document.getElementById('totalLosses').textContent = losses;
+            document.getElementById('winRate').textContent = tradeHistory.length > 0 ? formatPercentage((wins / tradeHistory.length) * 100) : '0%';
 
             updateCharts();
             saveState();
         }
 
-        // --- Chart Functions ---
+        // Chart Functions (explicitly global)
         function initializeCharts() {
             const monthlyPnLChartCanvas = document.getElementById('monthlyPnLChart');
             const monthlyVolumeChartCanvas = document.getElementById('monthlyVolumeChart');
@@ -1308,8 +1328,8 @@ Effective trading volume 3.19 USDT
             const ctxProjectedGrowth = projectedGrowthChartCanvas.getContext('2d');
 
             if (!ctxPnL || !ctxVolume || !ctxRoi || !ctxDailyPnL || !ctxDailyVolume || !ctxDiscrepancy || !ctxCumulativeBalance || !ctxProjectedGrowth) {
-                 console.error("Could not get 2D context for one or more chart canvases!");
-                 return;
+                   console.error("Could not get 2D context for one or more chart canvases!");
+                   return;
             }
 
             if (monthlyPnLChart) monthlyPnLChart.destroy();
@@ -1778,6 +1798,11 @@ Effective trading volume 3.19 USDT
             const monthlyPnLValues = sortedMonths.map(month => monthlyData[month].pnl);
             const monthlyVolumeValues = sortedMonths.map(month => monthlyData[month].volume);
 
+            console.log("Monthly PNL Labels:", sortedMonths);
+            console.log("Monthly PNL Values:", monthlyPnLValues);
+            console.log("Monthly Volume Labels:", sortedMonths);
+            console.log("Monthly Volume Values:", monthlyVolumeValues);
+
             if (monthlyPnLChart) {
                 monthlyPnLChart.data.labels = sortedMonths;
                 monthlyPnLChart.data.datasets[0].data = monthlyPnLValues;
@@ -1801,6 +1826,13 @@ Effective trading volume 3.19 USDT
             });
             const dailyPnLValues = sortedDates.map(date => dailyData[date].pnl);
             const dailyVolumeValues = sortedDates.map(date => dailyData[date].volume);
+
+            console.log("Daily ROI Labels:", sortedDates);
+            console.log("Daily ROI Values:", dailyRoiValues);
+            console.log("Daily PNL Labels:", sortedDates);
+            console.log("Daily PNL Values:", dailyPnLValues);
+            console.log("Daily Volume Labels:", sortedDates);
+            console.log("Daily Volume Values:", dailyVolumeValues);
 
 
             if (dailyRoiChart) {
@@ -1831,6 +1863,9 @@ Effective trading volume 3.19 USDT
             const discrepancyLabels = discrepancyHistory.map(entry => entry.time);
             const discrepancyChartValues = discrepancyHistory.map(entry => entry.value);
             
+            console.log("Discrepancy Labels:", discrepancyLabels);
+            console.log("Discrepancy Values:", discrepancyChartValues);
+
             if (discrepancyChart) {
                 discrepancyChart.data.labels = discrepancyLabels;
                 discrepancyChart.data.datasets[0].data = discrepancyChartValues;
@@ -1842,6 +1877,9 @@ Effective trading volume 3.19 USDT
             // Update Cumulative Balance Chart
             const cumulativeLabels = cumulativeBalanceHistory.map(entry => entry.time);
             const cumulativeValues = cumulativeBalanceHistory.map(entry => entry.balance);
+
+            console.log("Cumulative Balance Labels:", cumulativeLabels);
+            console.log("Cumulative Balance Values:", cumulativeValues);
 
             if (cumulativeBalanceChart) {
                 cumulativeBalanceChart.data.labels = cumulativeLabels;
@@ -1858,17 +1896,23 @@ Effective trading volume 3.19 USDT
             const actualCumulativeLabels = cumulativeBalanceHistory.map(entry => entry.time);
             const actualCumulativeValues = cumulativeBalanceHistory.map(entry => entry.balance);
 
+            // Combine and sort all unique dates for the x-axis
             const allComparisonLabels = Array.from(new Set([...projectedLabels, ...actualCumulativeLabels])).sort();
 
+            // Map projected and actual values to the combined labels, filling with null for missing dates
             const projectedAlignedValues = allComparisonLabels.map(date => {
-                const entry = projectedGrowthHistory.find(d => d.time === date);
+                const entry = projectedGrowthHistory.find(d => d.time.startsWith(date)); // Use startsWith for date matching
                 return entry ? entry.balance : null;
             });
 
             const actualAlignedValues = allComparisonLabels.map(date => {
-                const entry = cumulativeBalanceHistory.find(d => d.time === date);
+                const entry = cumulativeBalanceHistory.find(d => d.time.startsWith(date)); // Use startsWith for date matching
                 return entry ? entry.balance : null;
             });
+
+            console.log("Projected Growth Labels (Aligned):", allComparisonLabels);
+            console.log("Projected Growth Values (Aligned):", projectedAlignedValues);
+            console.log("Actual Cumulative Values (Aligned):", actualAlignedValues);
 
             if (projectedGrowthChart) {
                 // Update chart label based on selected method
@@ -1890,15 +1934,17 @@ Effective trading volume 3.19 USDT
             }
         }
 
-        // --- Data Parsing ---
+        // Data Parsing (explicitly global)
         function displayTrades(trades) {
+            const tradeHistoryOutput = document.getElementById('tradeHistoryOutput');
             tradeHistoryOutput.innerHTML = '';
             if (trades.length === 0) {
                 tradeHistoryOutput.innerHTML = '<p>No trade data processed yet.</p>';
                 return;
             }
 
-            [...trades].reverse().forEach((trade) => {
+            // Sort trades by time in descending order for display (most recent first)
+            [...trades].sort((a, b) => new Date(b.time).getTime() - new Date(a.time).getTime()).forEach((trade) => {
                 const tradeDiv = document.createElement('div');
                 tradeDiv.classList.add('trade-entry');
                 tradeDiv.innerHTML = `
@@ -1906,7 +1952,7 @@ Effective trading volume 3.19 USDT
                     <div class="card-row"><strong>Order No.:</strong><span>${trade.orderNo || 'N/A'}</span></div>
                     <div class="card-row"><strong>Time:</strong><span>${trade.time || 'N/A'}</span></div>
                     <div class="card-row"><strong>PNL:</strong><span class="${(trade.pnl || 0) >= 0 ? 'positive' : 'negative'}">${formatCurrency(trade.pnl || 0)}</span></div>
-                    <div class="card-row"><strong>ROI:</strong><span class="${(trade.pnl || 0) >= 0 ? 'positive' : 'negative'}">${formatPercentage(trade.roi || 0)}</span></div>
+                    <div class="card-row"><strong>ROI:</strong><span class="${(trade.pnl || 0) >= 0 ? 'positive' : 'negative'}">${formatDecimalPercentage(trade.roi || 0)}</span></div>
                     <div class="card-row"><strong>Amount:</strong><span>${formatCurrency(trade.amount || 0)}</span></div>
                     <div class="card-row"><strong>Effective Vol:</strong><span>${formatCurrency(trade.effectiveVolume || 0)}</span></div>
                 `;
@@ -1915,7 +1961,7 @@ Effective trading volume 3.19 USDT
         }
 
 
-        // Parser for DETAILED trade blocks (BTC/USDT, PNL, ROI, etc.)
+        // Parser for DETAILED trade blocks (BTC/USDT, PNL, ROI, etc.) (explicitly global)
         function parseTradeData(rawData) {
             rawData = rawData.trim();
             rawData = rawData.replace(/[\u00A0\u200B-\u200D\uFEFF]/g, ' ');
@@ -1999,87 +2045,7 @@ Effective trading volume 3.19 USDT
         }
 
 
-        // --- Event Listeners ---
-
-        usdtPhpRateInput.addEventListener('input', () => {
-            appSettings.usdtPhpRate = parseFloat(usdtPhpRateInput.value) || 0;
-            updateAllMetrics();
-        });
-        targetMonthlyIncomePhpInput.addEventListener('input', () => {
-            appSettings.targetMonthlyIncomePhp = parseFloat(targetMonthlyIncomePhpInput.value) || 0;
-            updateAllMetrics();
-        });
-        startingBalanceUsdtInput.addEventListener('input', () => {
-            appSettings.startingBalanceUsdt = parseFloat(startingBalanceUsdtInput.value) || 0;
-            updateAllMetrics();
-        });
-        projectedGainPerTradeInput.addEventListener('input', () => {
-            appSettings.projectedGainPerTrade = parseFloat(projectedGainPerTradeInput.value) || 0;
-            updateAllMetrics();
-        });
-        tradesPerDayInput.addEventListener('input', () => {
-            appSettings.tradesPerDay = parseInt(tradesPerDayInput.value) || 0;
-            updateAllMetrics();
-        });
-        projectionPeriodDaysInput.addEventListener('input', () => {
-            appSettings.projectionPeriodDays = parseInt(projectionPeriodDaysInput.value) || 0;
-            updateAllMetrics();
-        });
-        projectedTradeAmountInput.addEventListener('input', () => {
-            appSettings.projectedTradeAmount = parseFloat(projectedTradeAmountInput.value) || 0;
-            updateAllMetrics();
-        });
-        projectedRoiPerTradeInput.addEventListener('input', () => {
-            appSettings.projectedRoiPerTrade = parseFloat(projectedRoiPerTradeInput.value) || 0;
-            updateAllMetrics();
-        });
-        actualCurrentBalanceUsdtInput.addEventListener('input', () => {
-            balanceData.actualBalanceUsdt = parseFloat(actualCurrentBalanceUsdtInput.value) || 0;
-            updateAllMetrics();
-        });
-        schedulePlannerInput.addEventListener('input', () => {
-            appSettings.schedulePlanner = schedulePlannerInput.value;
-            saveState();
-        });
-
-        // Projection method radio button listeners
-        const projectionMethodRadios = document.querySelectorAll('input[name="projectionMethod"]');
-        projectionMethodRadios.forEach(radio => {
-            radio.addEventListener('change', (event) => {
-                appSettings.selectedProjectionMethod = event.target.value;
-                toggleProjectionInputs(event.target.value);
-                updateAllMetrics();
-            });
-        });
-
-        function toggleProjectionInputs(selectedMethod) {
-            if (selectedMethod === 'percent') {
-                percentProjectionInputsDiv.style.display = 'block';
-                fixedRoiProjectionInputsDiv.style.display = 'none';
-            } else if (selectedMethod === 'fixedRoi') {
-                percentProjectionInputsDiv.style.display = 'none';
-                fixedRoiProjectionInputsDiv.style.display = 'block';
-            }
-            if (selectedMethod !== 'percent' && selectedMethod !== 'fixedRoi') {
-                percentProjectionInputsDiv.style.display = 'none';
-                fixedRoiProjectionInputsDiv.style.display = 'none';
-            }
-        }
-
-
-        processDataButton.addEventListener('click', () => {
-            console.log("Process Detailed Trades button clicked.");
-            const rawData = tradeDataInput.value;
-            if (rawData.trim().length > 0) {
-                const newTrades = parseTradeData(rawData);
-                console.log("Parsed detailed trades:", newTrades);
-                handleNewParsedTrades(newTrades);
-            } else {
-                alert('Please paste your detailed trade data into the text area before clicking Process Detailed Trades.');
-            }
-        });
-
-
+        // Event listener for processing DETAILED trades (explicitly global)
         function handleNewParsedTrades(tradesOrTransactions) {
             if (tradesOrTransactions.length > 0) {
                 const existingTradeIdentifiers = new Set(tradeHistory.map(t => t.orderNo));
@@ -2107,11 +2073,11 @@ Effective trading volume 3.19 USDT
                     }
 
                     tradeHistory.push(...entriesToAdd);
-                    tradeHistory.sort((a, b) => new Date(a.time).getTime() - new Date(b.time).getTime());
+                    tradeHistory.sort((a, b) => new Date(a.time).getTime() - new Date(b.time).getTime()); // Keep sorted by time for calculations
                     
-                    tradeDataInput.value = '';
+                    document.getElementById('tradeDataInput').value = '';
                     
-                    displayTrades(tradeHistory);
+                    displayTrades(tradeHistory); // Display sorted descending
                     updateAllMetrics();
                 } else {
                     alert("No new or unique entries found to add from the pasted data. Check if entries are duplicates or malformed.");
@@ -2122,16 +2088,18 @@ Effective trading volume 3.19 USDT
         }
 
 
-        themeToggleButton.addEventListener('click', () => {
+        // Event listener for theme toggle (explicitly global)
+        function toggleTheme() {
             console.log("Theme toggle clicked.");
             const currentTheme = document.documentElement.getAttribute('data-theme');
             const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
             document.documentElement.setAttribute('data-theme', newTheme);
             appSettings.theme = newTheme;
             saveState();
-        });
+        }
 
-        resetDataButtonBottom.addEventListener('click', () => {
+        // Event listener for reset button (explicitly global)
+        function resetAllData() {
             console.log("Reset button clicked.");
             if (confirm("Are you sure you want to reset ALL your saved data? This action cannot be undone.")) {
                 tradeHistory = [];
@@ -2149,15 +2117,116 @@ Effective trading volume 3.19 USDT
                 loadState();
                 displayTrades(tradeHistory);
                 updateAllMetrics();
-                showSetupModal();
+                showSetupModal(); // Call showSetupModal from global scope
 
                 alert("All data has been reset.");
                 console.log("All data reset successfully.");
             }
-        });
+        }
 
+
+        // Setup Modal Functions (Explicitly global)
+        function showSetupModal() {
+            console.log("Attempting to show setup modal.");
+            const setupModalOverlay = document.getElementById('setupModalOverlay');
+            if (setupModalOverlay) {
+                setupModalOverlay.classList.add('visible');
+                updateSetupModalContent();
+            } else {
+                console.error("Setup modal overlay not found!");
+            }
+        }
+
+        function hideSetupModal() {
+            const setupModalOverlay = document.getElementById('setupModalOverlay');
+            if (setupModalOverlay) {
+                setupModalOverlay.classList.remove('visible');
+                localStorage.setItem('hasSeenSetup', 'true');
+            }
+        }
+
+        function updateSetupModalContent() {
+            const setupModalTitle = document.getElementById('setupModalTitle');
+            const setupModalBody = document.getElementById('setupModalBody');
+            const currentStepNumber = document.getElementById('currentStepNumber');
+            const totalStepsNumber = document.getElementById('totalStepsNumber');
+            const setupPrevButton = document.getElementById('setupPrevButton');
+            const setupNextButton = document.getElementById('setupNextButton');
+            const setupStartButton = document.getElementById('setupStartButton');
+
+            setupModalTitle.textContent = setupSteps[currentSetupStep].title;
+            setupModalBody.innerHTML = setupSteps[currentSetupStep].body;
+            currentStepNumber.textContent = currentSetupStep + 1;
+            totalStepsNumber.textContent = setupSteps.length;
+
+            setupPrevButton.disabled = currentSetupStep === 0;
+            setupNextButton.style.display = currentSetupStep === setupSteps.length - 1 ? 'none' : 'inline-block';
+            setupStartButton.style.display = currentSetupStep === setupSteps.length - 1 ? 'inline-block' : 'none';
+        }
+
+
+        // Main entry point when DOM is fully loaded
         document.addEventListener('DOMContentLoaded', () => {
             console.log("DOM fully loaded and parsed. Current time:", new Date().toLocaleString());
+
+            // Assign event listeners
+            document.getElementById('usdtPhpRate').addEventListener('input', () => { appSettings.usdtPhpRate = parseFloat(document.getElementById('usdtPhpRate').value) || 0; updateAllMetrics(); });
+            document.getElementById('targetMonthlyIncomePhp').addEventListener('input', () => { appSettings.targetMonthlyIncomePhp = parseFloat(document.getElementById('targetMonthlyIncomePhp').value) || 0; updateAllMetrics(); });
+            document.getElementById('startingBalanceUsdt').addEventListener('input', () => { appSettings.startingBalanceUsdt = parseFloat(document.getElementById('startingBalanceUsdt').value) || 0; updateAllMetrics(); });
+            document.getElementById('projectedGainPerTradeInput').addEventListener('input', () => { appSettings.projectedGainPerTrade = parseFloat(document.getElementById('projectedGainPerTradeInput').value) || 0; updateAllMetrics(); });
+            document.getElementById('tradesPerDayInput').addEventListener('input', () => { appSettings.tradesPerDay = parseInt(document.getElementById('tradesPerDayInput').value) || 0; updateAllMetrics(); });
+            document.getElementById('projectionPeriodDaysInput').addEventListener('input', () => { appSettings.projectionPeriodDays = parseInt(document.getElementById('projectionPeriodDaysInput').value) || 0; updateAllMetrics(); });
+            document.getElementById('projectedTradeAmountInput').addEventListener('input', () => { appSettings.projectedTradeAmount = parseFloat(document.getElementById('projectedTradeAmountInput').value) || 0; updateAllMetrics(); });
+            document.getElementById('projectedRoiPerTradeInput').addEventListener('input', () => { appSettings.projectedRoiPerTrade = parseFloat(document.getElementById('projectedRoiPerTradeInput').value) || 0; updateAllMetrics(); });
+            document.getElementById('targetTradingVolumeInput').addEventListener('input', () => { appSettings.targetTradingVolume = parseFloat(document.getElementById('targetTradingVolumeInput').value) || 0; updateAllMetrics(); });
+            document.getElementById('actualCurrentBalanceUsdtInput').addEventListener('input', () => { balanceData.actualBalanceUsdt = parseFloat(document.getElementById('actualCurrentBalanceUsdtInput').value) || 0; updateAllMetrics(); });
+            document.getElementById('schedulePlannerInput').addEventListener('input', () => { appSettings.schedulePlanner = document.getElementById('schedulePlannerInput').value; saveState(); });
+
+            document.querySelectorAll('input[name="projectionMethod"]').forEach(radio => {
+                radio.addEventListener('change', (event) => {
+                    appSettings.selectedProjectionMethod = event.target.value;
+                    toggleProjectionInputs(event.target.value);
+                    updateAllMetrics();
+                });
+            });
+
+            document.getElementById('processDataButton').addEventListener('click', () => {
+                console.log("Process Detailed Trades button clicked.");
+                const rawData = document.getElementById('tradeDataInput').value;
+                if (rawData.trim().length > 0) {
+                    const newTrades = parseTradeData(rawData);
+                    console.log("Parsed detailed trades:", newTrades);
+                    handleNewParsedTrades(newTrades);
+                } else {
+                    alert('Please paste your detailed trade data into the text area before clicking Process Detailed Trades.');
+                }
+            });
+
+            document.getElementById('themeToggle').addEventListener('click', toggleTheme);
+            document.getElementById('resetDataButtonBottom').addEventListener('click', resetAllData);
+
+
+            // Setup Modal Event Listeners
+            document.getElementById('setupNextButton').addEventListener('click', () => {
+                if (currentSetupStep < setupSteps.length - 1) {
+                    currentSetupStep++;
+                    updateSetupModalContent();
+                }
+            });
+
+            document.getElementById('setupPrevButton').addEventListener('click', () => {
+                if (currentSetupStep > 0) {
+                    currentSetupStep--;
+                    updateSetupModalContent();
+                }
+            });
+
+            document.getElementById('setupStartButton').addEventListener('click', () => {
+                hideSetupModal();
+            });
+
+
+            // Initial load sequence
             loadState();
             initializeCharts();
             updateAllMetrics();
