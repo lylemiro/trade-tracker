@@ -13,7 +13,7 @@
     <!-- External Libraries -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
-    <!-- NEW: Shepherd.js for Guided Tour -->
+    <!-- Shepherd.js for Guided Tour -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/shepherd.js@10.0.1/dist/css/shepherd.css"/>
     <script src="https://cdn.jsdelivr.net/npm/shepherd.js@10.0.1/dist/js/shepherd.min.js"></script>
 
@@ -606,13 +606,13 @@ Effective trading volume 3.19 USDT"></textarea>
         tour.addStep({
             title: 'Step 1: Financial Settings',
             text: 'First, enter your starting balance, target income, and the current USDT/PHP rate here.',
-            attachTo: { element: '#financialGoalsCard', on: 'top' },
+            attachTo: { element: '#financialGoalsCard', on: window.innerWidth < 768 ? 'bottom' : 'top' },
             buttons: [{ text: 'Back', action: tour.back }, { text: 'Next', action: tour.next }]
         });
         tour.addStep({
             title: 'Step 2: Add Your Trades',
             text: 'Now, paste your trade history into this box. You can also import a previous backup file.',
-            attachTo: { element: '#dataInputCard', on: 'right' },
+            attachTo: { element: '#dataInputCard', on: window.innerWidth < 768 ? 'bottom' : 'right' },
             buttons: [{ text: 'Back', action: tour.back }, { text: 'Next', action: tour.next }]
         });
         tour.addStep({
