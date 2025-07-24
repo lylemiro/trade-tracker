@@ -215,7 +215,19 @@
             <div class="col-12 col-lg-6 col-xl-4"><div class="card shadow-sm" id="dailyVolumeChartCard"><div class="card-header d-flex justify-content-between align-items-center" data-bs-toggle="collapse" href="#collapseDailyVol" role="button" aria-expanded="true" aria-controls="collapseDailyVol"><h2 class="h5 mb-0">Daily Volume</h2><i class="bi bi-chevron-down collapse-icon"></i></div><div class="collapse show" id="collapseDailyVol"><div class="card-body"><div class="chart-container"><canvas id="dailyVolumeChart"></canvas></div></div></div></div></div>
 
             <!-- Row 3: Performance Breakdowns -->
-            <div class="col-12 col-lg-6 col-xl-4"><div class="card shadow-sm" id="pnlByDayChartCard"><div class="card-header d-flex justify-content-between align-items-center" data-bs-toggle="collapse" href="#collapsePnlDay" role="button" aria-expanded="true" aria-controls="collapsePnlDay"><h2 class="h5 mb-0">PNL by Day</h2><i class="bi bi-chevron-down collapse-icon"></i></div><div class="collapse show" id="collapsePnlDay"><div class="card-body"><div class="chart-container"><canvas id="pnlByDayChart"></canvas></div></div></div></div></div>
+            <div class="col-12 col-lg-6 col-xl-4">
+                <div class="card shadow-sm" id="pnlByDayChartCard">
+                    <div class="card-header d-flex justify-content-between align-items-center" data-bs-toggle="collapse" href="#collapsePnlDay" role="button" aria-expanded="true" aria-controls="collapsePnlDay">
+                        <h2 class="h5 mb-0">Daily PNL (by Day of Week)</h2>
+                        <i class="bi bi-chevron-down collapse-icon"></i>
+                    </div>
+                    <div class="collapse show" id="collapsePnlDay">
+                        <div class="card-body">
+                            <div class="chart-container"><canvas id="pnlByDayChart"></canvas></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
             <div class="col-12 col-lg-6 col-xl-4"><div class="card shadow-sm" id="pnlByAssetChartCard"><div class="card-header d-flex justify-content-between align-items-center" data-bs-toggle="collapse" href="#collapsePnlAsset" role="button" aria-expanded="true" aria-controls="collapsePnlAsset"><h2 class="h5 mb-0">Performance by Asset</h2><i class="bi bi-chevron-down collapse-icon"></i></div><div class="collapse show" id="collapsePnlAsset"><div class="card-body"><div class="chart-container"><canvas id="pnlByAssetChart"></canvas></div></div></div></div></div>
             <div class="col-12 col-lg-6 col-xl-4"><div class="card shadow-sm" id="avgWinLossChartCard"><div class="card-header d-flex justify-content-between align-items-center" data-bs-toggle="collapse" href="#collapseAvgWinLoss" role="button" aria-expanded="true" aria-controls="collapseAvgWinLoss"><h2 class="h5 mb-0">Avg Win vs. Loss</h2><i class="bi bi-chevron-down collapse-icon"></i></div><div class="collapse show" id="collapseAvgWinLoss"><div class="card-body"><div class="chart-container"><canvas id="avgWinLossChart"></canvas></div></div></div></div></div>
 
@@ -435,35 +447,33 @@
             const maxProjectionCheck = 365 * 10; // Check up to 10 years
 
             for (let i = 0; i < maxProjectionCheck; i++) {
+                let currentDayBalance = projectedBalance;
                 if (i < appSettings.projectionPeriodDays) {
                     const futureDate = new Date(today);
                     futureDate.setDate(today.getDate() + i);
-                    let balanceForChart = projectedBalance;
                      for (let j = 0; j < appSettings.tradesPerDay; j++) {
                         if (appSettings.selectedProjectionMethod === 'percent') {
-                            balanceForChart += balanceForChart * (appSettings.projectedGainPerTrade / 100);
+                            currentDayBalance += currentDayBalance * (appSettings.projectedGainPerTrade / 100);
                         } else {
-                            balanceForChart += appSettings.projectedTradeAmount * (appSettings.projectedRoiPerTrade / 100);
+                            currentDayBalance += appSettings.projectedTradeAmount * (appSettings.projectedRoiPerTrade / 100);
                         }
                     }
-                    projectedGrowthHistory.push({ time: futureDate.toISOString(), balance: balanceForChart });
+                    projectedGrowthHistory.push({ time: futureDate.toISOString(), balance: currentDayBalance });
                 }
 
                 if (!reachedTarget) {
-                    let tempBalance = projectedBalance;
                     for (let j = 0; j < appSettings.tradesPerDay; j++) {
                         if (appSettings.selectedProjectionMethod === 'percent') {
-                            tempBalance += tempBalance * (appSettings.projectedGainPerTrade / 100);
+                            projectedBalance += projectedBalance * (appSettings.projectedGainPerTrade / 100);
                         } else {
-                            tempBalance += appSettings.projectedTradeAmount * (appSettings.projectedRoiPerTrade / 100);
+                            projectedBalance += appSettings.projectedTradeAmount * (appSettings.projectedRoiPerTrade / 100);
                         }
-                        if (tempBalance >= targetBalance) {
+                        if (projectedBalance >= targetBalance) {
                             daysToTarget = i + ((j + 1) / appSettings.tradesPerDay);
                             reachedTarget = true;
                             break;
                         }
                     }
-                    projectedBalance = tempBalance;
                 }
                 
                 if (i >= appSettings.projectionPeriodDays && reachedTarget) {
@@ -605,7 +615,7 @@
                 options: { ...commonLineOptions, scales: { ...commonLineOptions.scales, x: { ...commonLineOptions.scales.x, title: { ...commonLineOptions.scales.x.title, text: 'Date' } } } }
             });
             
-            pnlByDayChart = new Chart('pnlByDayChart', { type: 'bar', data: { datasets: [{ label: 'Total PNL (USDT)' }] }, options: { ...commonLineOptions, scales: { ...commonLineOptions.scales, x: { ...commonLineOptions.scales.x, title: { ...commonLineOptions.scales.x.title, text: 'Day of the Week' } } } } });
+            pnlByDayChart = new Chart('pnlByDayChart', { type: 'bar', data: { datasets: [{ label: 'Daily PNL (USDT)' }] }, options: { ...commonLineOptions, scales: { ...commonLineOptions.scales, x: { ...commonLineOptions.scales.x, title: { ...commonLineOptions.scales.x.title, text: 'Date' } } } } });
             pnlByAssetChart = new Chart('pnlByAssetChart', { type: 'bar', data: { datasets: [{ label: 'Total PNL (USDT)', backgroundColor: 'rgba(75, 192, 192, 0.6)' }, { label: 'Win Rate (%)', type: 'line', yAxisID: 'y1', borderColor: 'rgb(255, 159, 64)', tension: 0.1 }] }, options: { ...commonLineOptions, scales: { ...commonLineOptions.scales, x: { ...commonLineOptions.scales.x, title: { ...commonLineOptions.scales.x.title, text: 'Asset' } }, y1: { type: 'linear', display: true, position: 'right', grid: { drawOnChartArea: false }, ticks: { callback: value => value.toFixed(1) + '%' } } } } });
             avgWinLossChart = new Chart('avgWinLossChart', { type: 'bar', data: { datasets: [{ label: 'Average Amount (USDT)' }] }, options: { ...commonLineOptions, scales: { ...commonLineOptions.scales, x: { ...commonLineOptions.scales.x, title: { text: 'Outcome' } } } } });
         }
@@ -613,10 +623,18 @@
         function updateCharts() {
             const monthlyData = {};
             const dailyData = {};
-            const pnlByDay = { 'Sun': 0, 'Mon': 0, 'Tue': 0, 'Wed': 0, 'Thu': 0, 'Fri': 0, 'Sat': 0 };
             const pnlByAsset = {};
             let totalWinsPnl = 0, winCount = 0, totalLossesPnl = 0, lossCount = 0;
             const dayMap = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+             const dayColors = {
+                'Sun': 'rgba(255, 99, 132, 0.7)',
+                'Mon': 'rgba(54, 162, 235, 0.7)',
+                'Tue': 'rgba(255, 206, 86, 0.7)',
+                'Wed': 'rgba(75, 192, 192, 0.7)',
+                'Thu': 'rgba(153, 102, 255, 0.7)',
+                'Fri': 'rgba(255, 159, 64, 0.7)',
+                'Sat': 'rgba(99, 255, 132, 0.7)'
+            };
 
             tradeHistory.forEach(trade => {
                 const tradeDate = new Date(trade.time);
@@ -632,9 +650,6 @@
                 dailyData[fullDate].volume += (trade.effectiveVolume || 0);
                 dailyData[fullDate].roiSum += (trade.roi || 0);
                 dailyData[fullDate].roiCount++;
-
-                const dayOfWeek = dayMap[tradeDate.getDay()];
-                pnlByDay[dayOfWeek] += (trade.pnl || 0);
 
                 if (!pnlByAsset[trade.pair]) {
                     pnlByAsset[trade.pair] = { pnl: 0, wins: 0, losses: 0 };
@@ -682,10 +697,16 @@
                 const entry = cumulativeBalanceHistory.slice().reverse().find(e => e.time.startsWith(date));
                 return entry ? entry.balance : null;
             });
-
-            pnlByDayChart.data.labels = Object.keys(pnlByDay);
-            pnlByDayChart.data.datasets[0].data = Object.values(pnlByDay);
-            pnlByDayChart.data.datasets[0].backgroundColor = Object.values(pnlByDay).map(pnl => pnl >= 0 ? 'rgba(75, 192, 192, 0.6)' : 'rgba(255, 99, 132, 0.6)');
+            
+            pnlByDayChart.data.labels = sortedDates;
+            pnlByDayChart.data.datasets[0].data = sortedDates.map(d => dailyData[d].pnl);
+            pnlByDayChart.data.datasets[0].backgroundColor = sortedDates.map(dateStr => {
+                // We need to add a day to the date because of timezone offsets causing it to be off by one
+                const date = new Date(dateStr);
+                date.setDate(date.getDate() + 1);
+                const dayOfWeek = dayMap[date.getDay()];
+                return dayColors[dayOfWeek];
+            });
 
             const sortedAssets = Object.keys(pnlByAsset).sort((a, b) => pnlByAsset[b].pnl - pnlByAsset[a].pnl);
             pnlByAssetChart.data.labels = sortedAssets;

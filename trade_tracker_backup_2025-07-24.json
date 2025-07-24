@@ -1,0 +1,281 @@
+{
+  "tradeHistory": [
+    {
+      "pair": "BTC/USDT",
+      "orderNo": "579224314446912",
+      "time": "2025-07-18 18:42",
+      "pnl": 2.27,
+      "roi": 74.92,
+      "effectiveVolume": 3.03
+    },
+    {
+      "pair": "BTC/USDT",
+      "orderNo": "579295468434752",
+      "time": "2025-07-19 14:00",
+      "pnl": 2.28,
+      "roi": 74.75,
+      "effectiveVolume": 3.05
+    },
+    {
+      "pair": "BTC/USDT",
+      "orderNo": "579314097943136",
+      "time": "2025-07-19 19:03",
+      "pnl": 2.59,
+      "roi": 84.09,
+      "effectiveVolume": 3.08
+    },
+    {
+      "pair": "BTC/USDT",
+      "orderNo": "579402433631680",
+      "time": "2025-07-20 19:01",
+      "pnl": 2.31,
+      "roi": 74.52,
+      "effectiveVolume": 3.1
+    },
+    {
+      "pair": "BTC/USDT",
+      "orderNo": "579472662292512",
+      "time": "2025-07-21 14:04",
+      "pnl": 2.33,
+      "roi": 74.68,
+      "effectiveVolume": 3.12
+    },
+    {
+      "pair": "BTC/USDT",
+      "orderNo": "579491036436768",
+      "time": "2025-07-21 19:03",
+      "pnl": 2.22,
+      "roi": 70.48,
+      "effectiveVolume": 3.15
+    },
+    {
+      "pair": "BTC/USDT",
+      "orderNo": "579560936608960",
+      "time": "2025-07-22 14:01",
+      "pnl": 2.3,
+      "roi": 72.56,
+      "effectiveVolume": 3.17
+    },
+    {
+      "pair": "BTC/USDT",
+      "orderNo": "579579592027456",
+      "time": "2025-07-22 19:04",
+      "pnl": 2.36,
+      "roi": 73.98,
+      "effectiveVolume": 3.19
+    },
+    {
+      "pair": "BTC/USDT",
+      "orderNo": "579649545002400",
+      "time": "2025-07-23 14:03",
+      "pnl": 2.38,
+      "roi": 73.91,
+      "effectiveVolume": 3.22
+    },
+    {
+      "pair": "BTC/USDT",
+      "orderNo": "579667984794976",
+      "time": "2025-07-23 19:03",
+      "pnl": 2.42,
+      "roi": 74.69,
+      "effectiveVolume": 3.24
+    }
+  ],
+  "appSettings": {
+    "usdtPhpRate": 58.9,
+    "targetMonthlyIncomePhp": 50000,
+    "startingBalanceUsdt": 300.48,
+    "projectedGainPerTrade": 1,
+    "tradesPerDay": 2,
+    "projectionPeriodDays": 15,
+    "projectedTradeAmount": 3,
+    "projectedRoiPerTrade": 70,
+    "selectedProjectionMethod": "percent",
+    "theme": "light",
+    "schedulePlanner": "",
+    "targetTradingVolume": 300
+  },
+  "balanceData": {
+    "previousBalanceUsdt": 321.52000000000004,
+    "calculatedBalanceUsdt": 323.94,
+    "actualBalanceUsdt": 326.94
+  },
+  "lastTradeStats": {
+    "currentGainUsdt": 2.42,
+    "currentRoi": 74.69,
+    "previousGainUsdt": 2.38,
+    "lastTradeAmount": 3.24,
+    "previousTradeAmount": 3.22
+  },
+  "cardStates": {
+    "calculatedGoalsCard": "expanded",
+    "financialGoalsCard": "expanded",
+    "processedHistoryCard": "collapsed"
+  },
+  "discrepancyHistory": [
+    {
+      "time": "2025-07-24T01:29:51.575Z",
+      "value": -301
+    },
+    {
+      "time": "2025-07-24T01:30:03.042Z",
+      "value": -300.48
+    },
+    {
+      "time": "2025-07-24T01:30:09.400Z",
+      "value": -319.14000000000004
+    },
+    {
+      "time": "2025-07-24T01:30:17.410Z",
+      "value": 2.999999999999943
+    },
+    {
+      "time": "2025-07-24T01:32:23.063Z",
+      "value": 0.6199999999999477
+    },
+    {
+      "time": "2025-07-24T01:32:29.049Z",
+      "value": -1.8000000000000114
+    },
+    {
+      "time": "2025-07-24T01:32:51.512Z",
+      "value": 3
+    },
+    {
+      "time": "2025-07-24T01:34:02.518Z",
+      "value": 3
+    },
+    {
+      "time": "2025-07-24T01:34:13.042Z",
+      "value": 3
+    },
+    {
+      "time": "2025-07-24T01:34:26.776Z",
+      "value": 3
+    },
+    {
+      "time": "2025-07-24T01:47:03.214Z",
+      "value": 3
+    },
+    {
+      "time": "2025-07-24T01:48:43.076Z",
+      "value": 3
+    },
+    {
+      "time": "2025-07-24T02:12:42.120Z",
+      "value": 3
+    },
+    {
+      "time": "2025-07-24T02:14:29.683Z",
+      "value": 3
+    },
+    {
+      "time": "2025-07-24T02:15:30.407Z",
+      "value": 3
+    }
+  ],
+  "cumulativeBalanceHistory": [
+    {
+      "time": "2025-07-18 18:42",
+      "balance": 302.75
+    },
+    {
+      "time": "2025-07-19 14:00",
+      "balance": 305.03
+    },
+    {
+      "time": "2025-07-19 19:03",
+      "balance": 307.61999999999995
+    },
+    {
+      "time": "2025-07-20 19:01",
+      "balance": 309.92999999999995
+    },
+    {
+      "time": "2025-07-21 14:04",
+      "balance": 312.25999999999993
+    },
+    {
+      "time": "2025-07-21 19:03",
+      "balance": 314.47999999999996
+    },
+    {
+      "time": "2025-07-22 14:01",
+      "balance": 316.78
+    },
+    {
+      "time": "2025-07-22 19:04",
+      "balance": 319.14
+    },
+    {
+      "time": "2025-07-23 14:03",
+      "balance": 321.52
+    },
+    {
+      "time": "2025-07-23 19:03",
+      "balance": 323.94
+    }
+  ],
+  "projectedGrowthHistory": [
+    {
+      "time": "2025-07-24T02:15:30.407Z",
+      "balance": 330.451194
+    },
+    {
+      "time": "2025-07-25T02:15:30.407Z",
+      "balance": 337.0932629994
+    },
+    {
+      "time": "2025-07-26T02:15:30.407Z",
+      "balance": 343.8688375856879
+    },
+    {
+      "time": "2025-07-27T02:15:30.407Z",
+      "balance": 350.7806012211602
+    },
+    {
+      "time": "2025-07-28T02:15:30.407Z",
+      "balance": 357.8312913057055
+    },
+    {
+      "time": "2025-07-29T02:15:30.407Z",
+      "balance": 365.0237002609502
+    },
+    {
+      "time": "2025-07-30T02:15:30.407Z",
+      "balance": 372.3606766361953
+    },
+    {
+      "time": "2025-07-31T02:15:30.407Z",
+      "balance": 379.84512623658287
+    },
+    {
+      "time": "2025-08-01T02:15:30.407Z",
+      "balance": 387.48001327393814
+    },
+    {
+      "time": "2025-08-02T02:15:30.407Z",
+      "balance": 395.2683615407443
+    },
+    {
+      "time": "2025-08-03T02:15:30.407Z",
+      "balance": 403.2132556077133
+    },
+    {
+      "time": "2025-08-04T02:15:30.407Z",
+      "balance": 411.31784204542834
+    },
+    {
+      "time": "2025-08-05T02:15:30.407Z",
+      "balance": 419.58533067054145
+    },
+    {
+      "time": "2025-08-06T02:15:30.407Z",
+      "balance": 428.01899581701934
+    },
+    {
+      "time": "2025-08-07T02:15:30.407Z",
+      "balance": 436.62217763294143
+    }
+  ]
+}
