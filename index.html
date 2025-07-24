@@ -398,25 +398,43 @@
 
         // --- Sound Synthesis with Tone.js ---
         let soundsReady = false;
-        let winSound, lossSound;
+        let popSoundWin, popSoundLoss;
 
         function initializeSounds() {
             if (soundsReady) return;
-            winSound = new Tone.Synth({ oscillator: { type: 'triangle' }, envelope: { attack: 0.005, decay: 0.1, sustain: 0.3, release: 1 } }).toDestination();
-            lossSound = new Tone.Synth({ oscillator: { type: 'square' }, envelope: { attack: 0.005, decay: 0.2, sustain: 0.1, release: 1 } }).toDestination();
+            // A synth for a higher, positive notification "pop"
+            popSoundWin = new Tone.Synth({
+                oscillator: { type: "sine" },
+                envelope: { attack: 0.001, decay: 0.1, sustain: 0, release: 0.1 }
+            }).toDestination();
+            popSoundWin.volume.value = -6; // Lower the volume to be less intrusive
+
+            // A synth for a lower, neutral/negative notification "pop"
+            popSoundLoss = new Tone.Synth({
+                oscillator: { type: "sine" },
+                envelope: { attack: 0.001, decay: 0.15, sustain: 0, release: 0.1 }
+            }).toDestination();
+            popSoundLoss.volume.value = -6;
+
             soundsReady = true;
         }
 
         async function playSound(type) {
-            if (Tone.context.state !== 'running') { await Tone.start(); }
-            if (!soundsReady) { initializeSounds(); }
+            // Audio context must be started by a user gesture.
+            if (Tone.context.state !== 'running') {
+                await Tone.start();
+            }
+            if (!soundsReady) {
+                initializeSounds();
+            }
+
             const now = Tone.now();
             if (type === 'win') {
-                winSound.triggerAttackRelease('C5', '8n', now);
-                winSound.triggerAttackRelease('E5', '8n', now + 0.1);
-                winSound.triggerAttackRelease('G5', '8n', now + 0.2);
+                // Play a short, high-pitched pop
+                popSoundWin.triggerAttackRelease("A5", "32n", now);
             } else if (type === 'loss') {
-                lossSound.triggerAttackRelease('A2', '4n', now);
+                // Play a slightly lower pop
+                popSoundLoss.triggerAttackRelease("A4", "32n", now);
             }
         }
 
