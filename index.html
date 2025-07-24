@@ -66,9 +66,9 @@
             margin-bottom: 0.5rem;
         }
         
-        /* Shepherd.js tour styling - REVERTED TO ORIGINAL BUBBLE STYLE */
+        /* Shepherd.js tour styling */
         .shepherd-element {
-            max-width: 175px; /* User requested width */
+            max-width: 175px; /* Default small width for tour steps */
         }
         .shepherd-has-title .shepherd-content .shepherd-header {
             background: #e6e6e6;
@@ -84,18 +84,18 @@
         .shepherd-title {
             font-size: 11px !important;
             font-weight: bold !important;
-            color: #333; /* Darker text for light background */
+            color: #333;
         }
         .shepherd-text {
-            font-size: 10px !important; /* User requested font size */
+            font-size: 10px !important;
             color: #333;
         }
         .shepherd-button {
             background: var(--bs-primary);
             color: white;
             border: none;
-            padding: 0.25rem 0.5rem; /* Smaller padding */
-            font-size: 10px;         /* Smaller font size */
+            padding: 0.25rem 0.5rem;
+            font-size: 10px;
             border-radius: 0.25rem;
             margin-right: 0.5rem;
         }
@@ -105,10 +105,31 @@
         .shepherd-button.shepherd-button-secondary {
             background: var(--bs-secondary);
         }
+
+        /* NEW: Override for the first welcome step to make it standard size */
+        .shepherd-step-welcome.shepherd-element {
+            max-width: 350px; /* A more standard width */
+        }
+        .shepherd-step-welcome .shepherd-title {
+            font-size: 1rem !important;
+        }
+        .shepherd-step-welcome .shepherd-text {
+            font-size: 0.875rem !important;
+        }
+        .shepherd-step-welcome .shepherd-button {
+            padding: 0.375rem 0.75rem;
+            font-size: 1rem;
+        }
         
         /* Card title padding adjustment */
         .card h2, .card h3 {
             padding-bottom: 8px; /* Reduced from 10px */
+        }
+        
+        /* Chart toggle buttons */
+        .chart-toggle-buttons .btn {
+            font-size: 0.75rem;
+            padding: 0.25rem 0.5rem;
         }
     </style>
 </head>
@@ -149,7 +170,6 @@
                                 <span>Days to Target (Projection):</span> <strong id="goalDaysRemainingProjection"></strong>
                             </div>
                             <hr>
-                            <!-- LOGIC CHANGE: Replaced "Wallet Balance Needed" with "Required Avg. Trade Size" -->
                             <div class="d-flex justify-content-between" title="The average trade size you need to use to hit your monthly income target, based on your historical ROI and trades per day.">
                                 <span>Required Avg. Trade Size:</span> <strong id="goalRequiredAvgTradeSize" class="text-info"></strong>
                             </div>
@@ -196,7 +216,7 @@
                 </div>
             </div>
 
-            <!-- Row 2: Daily & Streak Analytics -->
+            <!-- Row 2: Analytics & Charts -->
             <div class="col-12 col-lg-6 col-xl-4">
                 <div class="card shadow-sm" id="streakAnalyticsCard">
                     <div class="card-header d-flex justify-content-between align-items-center" data-bs-toggle="collapse" href="#collapseStreaks" role="button" aria-expanded="true" aria-controls="collapseStreaks">
@@ -216,34 +236,74 @@
                     </div>
                 </div>
             </div>
-            <div class="col-12 col-lg-6 col-xl-4"><div class="card shadow-sm" id="dailyRoiChartCard"><div class="card-header d-flex justify-content-between align-items-center" data-bs-toggle="collapse" href="#collapseDailyRoi" role="button" aria-expanded="true" aria-controls="collapseDailyRoi"><h2 class="h5 mb-0">Daily ROI</h2><i class="bi bi-chevron-down collapse-icon"></i></div><div class="collapse show" id="collapseDailyRoi"><div class="card-body"><div class="chart-container"><canvas id="dailyRoiChart"></canvas></div></div></div></div></div>
-            <div class="col-12 col-lg-6 col-xl-4"><div class="card shadow-sm" id="dailyVolumeChartCard"><div class="card-header d-flex justify-content-between align-items-center" data-bs-toggle="collapse" href="#collapseDailyVol" role="button" aria-expanded="true" aria-controls="collapseDailyVol"><h2 class="h5 mb-0">Daily Volume</h2><i class="bi bi-chevron-down collapse-icon"></i></div><div class="collapse show" id="collapseDailyVol"><div class="card-body"><div class="chart-container"><canvas id="dailyVolumeChart"></canvas></div></div></div></div></div>
-
-            <!-- Row 3: Performance Breakdowns -->
+            
+            <!-- NEW: Consolidated Chart Card 1 -->
             <div class="col-12 col-lg-6 col-xl-4">
-                <div class="card shadow-sm" id="pnlByDayChartCard">
-                    <div class="card-header d-flex justify-content-between align-items-center" data-bs-toggle="collapse" href="#collapsePnlDay" role="button" aria-expanded="true" aria-controls="collapsePnlDay">
-                        <h2 class="h5 mb-0">Daily PNL (by Day of Week)</h2>
+                <div class="card shadow-sm" id="hubChartCard">
+                    <div class="card-header d-flex justify-content-between align-items-center" data-bs-toggle="collapse" href="#collapseHubChart" role="button" aria-expanded="true" aria-controls="collapseHubChart">
+                        <h2 class="h5 mb-0"><i class="bi bi-pie-chart me-2"></i>Performance Hub</h2>
                         <i class="bi bi-chevron-down collapse-icon"></i>
                     </div>
-                    <div class="collapse show" id="collapsePnlDay">
+                    <div class="collapse show" id="collapseHubChart">
                         <div class="card-body">
-                            <div class="chart-container"><canvas id="pnlByDayChart"></canvas></div>
+                            <div class="chart-container">
+                                <canvas id="hubChartCanvas"></canvas>
+                            </div>
+                             <div class="btn-group w-100 mt-2 chart-toggle-buttons" role="group" aria-label="Hub Chart Toggles">
+                                <button type="button" class="btn btn-outline-primary" data-chart-card="hub" data-chart-type="cumulative">Balance</button>
+                                <button type="button" class="btn btn-outline-primary" data-chart-card="hub" data-chart-type="projection">Projection</button>
+                                <button type="button" class="btn btn-outline-primary" data-chart-card="hub" data-chart-type="discrepancy">Discrepancy</button>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="col-12 col-lg-6 col-xl-4"><div class="card shadow-sm" id="pnlByAssetChartCard"><div class="card-header d-flex justify-content-between align-items-center" data-bs-toggle="collapse" href="#collapsePnlAsset" role="button" aria-expanded="true" aria-controls="collapsePnlAsset"><h2 class="h5 mb-0">Performance by Asset</h2><i class="bi bi-chevron-down collapse-icon"></i></div><div class="collapse show" id="collapsePnlAsset"><div class="card-body"><div class="chart-container"><canvas id="pnlByAssetChart"></canvas></div></div></div></div></div>
-            <div class="col-12 col-lg-6 col-xl-4"><div class="card shadow-sm" id="avgWinLossChartCard"><div class="card-header d-flex justify-content-between align-items-center" data-bs-toggle="collapse" href="#collapseAvgWinLoss" role="button" aria-expanded="true" aria-controls="collapseAvgWinLoss"><h2 class="h5 mb-0">Avg Win vs. Loss</h2><i class="bi bi-chevron-down collapse-icon"></i></div><div class="collapse show" id="collapseAvgWinLoss"><div class="card-body"><div class="chart-container"><canvas id="avgWinLossChart"></canvas></div></div></div></div></div>
 
-            <!-- Row 4: Monthly & Cumulative Charts -->
-            <div class="col-12 col-lg-6 col-xl-4"><div class="card shadow-sm" id="monthlyPnlChartCard"><div class="card-header d-flex justify-content-between align-items-center" data-bs-toggle="collapse" href="#collapseMonthlyPnl" role="button" aria-expanded="true" aria-controls="collapseMonthlyPnl"><h2 class="h5 mb-0">Monthly PNL</h2><i class="bi bi-chevron-down collapse-icon"></i></div><div class="collapse show" id="collapseMonthlyPnl"><div class="card-body"><div class="chart-container"><canvas id="monthlyPnLChart"></canvas></div></div></div></div></div>
-            <div class="col-12 col-lg-6 col-xl-4"><div class="card shadow-sm" id="monthlyVolumeChartCard"><div class="card-header d-flex justify-content-between align-items-center" data-bs-toggle="collapse" href="#collapseMonthlyVol" role="button" aria-expanded="true" aria-controls="collapseMonthlyVol"><h2 class="h5 mb-0">Monthly Volume</h2><i class="bi bi-chevron-down collapse-icon"></i></div><div class="collapse show" id="collapseMonthlyVol"><div class="card-body"><div class="chart-container"><canvas id="monthlyVolumeChart"></canvas></div></div></div></div></div>
-            <div class="col-12 col-lg-6 col-xl-4"><div class="card shadow-sm" id="cumulativeBalanceChartCard"><div class="card-header d-flex justify-content-between align-items-center" data-bs-toggle="collapse" href="#collapseCumBalance" role="button" aria-expanded="true" aria-controls="collapseCumBalance"><h2 class="h5 mb-0">Cumulative Balance</h2><i class="bi bi-chevron-down collapse-icon"></i></div><div class="collapse show" id="collapseCumBalance"><div class="card-body"><div class="chart-container"><canvas id="cumulativeBalanceChart"></canvas></div></div></div></div></div>
+            <!-- NEW: Consolidated Chart Card 2 -->
+            <div class="col-12 col-lg-6 col-xl-4">
+                <div class="card shadow-sm" id="periodicChartCard">
+                    <div class="card-header d-flex justify-content-between align-items-center" data-bs-toggle="collapse" href="#collapsePeriodicChart" role="button" aria-expanded="true" aria-controls="collapsePeriodicChart">
+                        <h2 class="h5 mb-0"><i class="bi bi-calendar-event me-2"></i>Periodic Analysis</h2>
+                        <i class="bi bi-chevron-down collapse-icon"></i>
+                    </div>
+                    <div class="collapse show" id="collapsePeriodicChart">
+                        <div class="card-body">
+                            <div class="chart-container">
+                                <canvas id="periodicChartCanvas"></canvas>
+                            </div>
+                             <div class="btn-group w-100 mt-2 chart-toggle-buttons" role="group" aria-label="Periodic Chart Toggles">
+                                <button type="button" class="btn btn-outline-primary" data-chart-card="periodic" data-chart-type="monthlyPnl">Monthly PNL</button>
+                                <button type="button" class="btn btn-outline-primary" data-chart-card="periodic" data-chart-type="dailyPnl">Daily PNL</button>
+                                <button type="button" class="btn btn-outline-primary" data-chart-card="periodic" data-chart-type="dailyRoi">Daily ROI</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-            <!-- Row 5: Projections & Long-Term -->
-            <div class="col-12 col-lg-6 col-xl-4"><div class="card shadow-sm" id="projectedGrowthChartCard"><div class="card-header d-flex justify-content-between align-items-center" data-bs-toggle="collapse" href="#collapseProjGrowth" role="button" aria-expanded="true" aria-controls="collapseProjGrowth"><h2 class="h5 mb-0">Projected Growth</h2><i class="bi bi-chevron-down collapse-icon"></i></div><div class="collapse show" id="collapseProjGrowth"><div class="card-body"><div class="chart-container"><canvas id="projectedGrowthChart"></canvas></div></div></div></div></div>
-            <div class="col-12 col-lg-6 col-xl-4"><div class="card shadow-sm" id="discrepancyChartCard"><div class="card-header d-flex justify-content-between align-items-center" data-bs-toggle="collapse" href="#collapseDiscrepancy" role="button" aria-expanded="true" aria-controls="collapseDiscrepancy"><h2 class="h5 mb-0">Discrepancy History</h2><i class="bi bi-chevron-down collapse-icon"></i></div><div class="collapse show" id="collapseDiscrepancy"><div class="card-body"><div class="chart-container"><canvas id="discrepancyChart"></canvas></div></div></div></div></div>
+            <!-- NEW: Consolidated Chart Card 3 -->
+            <div class="col-12 col-lg-6 col-xl-4">
+                <div class="card shadow-sm" id="metricsChartCard">
+                    <div class="card-header d-flex justify-content-between align-items-center" data-bs-toggle="collapse" href="#collapseMetricsChart" role="button" aria-expanded="true" aria-controls="collapseMetricsChart">
+                        <h2 class="h5 mb-0"><i class="bi bi-graph-up me-2"></i>Metric Breakdowns</h2>
+                        <i class="bi bi-chevron-down collapse-icon"></i>
+                    </div>
+                    <div class="collapse show" id="collapseMetricsChart">
+                        <div class="card-body">
+                            <div class="chart-container">
+                                <canvas id="metricsChartCanvas"></canvas>
+                            </div>
+                            <div class="btn-group w-100 mt-2 chart-toggle-buttons" role="group" aria-label="Metrics Chart Toggles">
+                                <button type="button" class="btn btn-outline-primary" data-chart-card="metrics" data-chart-type="byAsset">By Asset</button>
+                                <button type="button" class="btn btn-outline-primary" data-chart-card="metrics" data-chart-type="avgWinLoss">Win/Loss</button>
+                                <button type="button" class="btn btn-outline-primary" data-chart-card="metrics" data-chart-type="monthlyVolume">Volume</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Row 3: Schedule & Settings -->
             <div class="col-12 col-lg-6 col-xl-4">
                 <div class="card shadow-sm" id="schedulePlannerCard">
                     <div class="card-header d-flex justify-content-between align-items-center" data-bs-toggle="collapse" href="#collapseSchedule" role="button" aria-expanded="true" aria-controls="collapseSchedule">
@@ -258,8 +318,6 @@
                     </div>
                 </div>
             </div>
-
-            <!-- Row 6: Settings -->
             <div class="col-12 col-lg-6 col-xl-4">
                 <div class="card shadow-sm" id="financialGoalsCard">
                     <div class="card-header d-flex justify-content-between align-items-center" data-bs-toggle="collapse" href="#collapseGoals" role="button" aria-expanded="true" aria-controls="collapseGoals">
@@ -303,7 +361,7 @@
                 </div>
             </div>
             
-            <!-- Row 7: Input & History (Lowest Priority) -->
+            <!-- Row 4: Input & History (Lowest Priority) -->
             <div class="col-12 col-lg-6 col-xl-4">
                 <div class="card shadow-sm" id="dataInputCard">
                     <div class="card-header d-flex justify-content-between align-items-center" data-bs-toggle="collapse" href="#collapseDataInput" role="button" aria-expanded="true" aria-controls="collapseDataInput">
@@ -371,7 +429,7 @@
     <script>
         /* --- JAVASCRIPT LOGIC (script.js) --- */
         // --- GLOBAL VARIABLES (Accessible throughout the script) ---
-        let monthlyPnLChart, monthlyVolumeChart, dailyRoiChart, dailyVolumeChart, discrepancyChart, cumulativeBalanceChart, projectedGrowthChart, pnlByDayChart, pnlByAssetChart, avgWinLossChart;
+        let hubChart, periodicChart, metricsChart; // NEW: Consolidated chart instances
         let tour;
         let coinList = []; // To store the fetched list of coins
         let resetModal; // Variable to hold the modal instance
@@ -380,8 +438,10 @@
         const DEFAULT_BALANCE_DATA = { previousBalance: 0, calculatedBalance: 0, actualBalance: 0 };
         const DEFAULT_LAST_TRADE_STATS = { currentGain: 0, currentRoi: 0, previousGain: 0, lastTradeAmount: 0, previousTradeAmount: 0 };
         const DEFAULT_CARD_STATES = {};
+        // NEW: State for active chart views
+        const DEFAULT_ACTIVE_CHART_VIEWS = { hub: 'cumulative', periodic: 'monthlyPnl', metrics: 'byAsset' };
 
-        let tradeHistory = [], appSettings = { ...DEFAULT_APP_SETTINGS }, balanceData = { ...DEFAULT_BALANCE_DATA }, lastTradeStats = { ...DEFAULT_LAST_TRADE_STATS }, cardStates = { ...DEFAULT_CARD_STATES }, discrepancyHistory = [], cumulativeBalanceHistory = [], projectedGrowthHistory = [];
+        let tradeHistory = [], appSettings = { ...DEFAULT_APP_SETTINGS }, balanceData = { ...DEFAULT_BALANCE_DATA }, lastTradeStats = { ...DEFAULT_LAST_TRADE_STATS }, cardStates = { ...DEFAULT_CARD_STATES }, discrepancyHistory = [], cumulativeBalanceHistory = [], projectedGrowthHistory = [], activeChartViews = {...DEFAULT_ACTIVE_CHART_VIEWS};
 
         // --- Helper Functions ---
         const cleanLine = (line) => line.replace(/[\u00A0\u200B-\u200D\uFEFF]/g, ' ').replace(/\s+/g, ' ').trim();
@@ -463,7 +523,7 @@ Effective trading volume ${volExample} ${currency}`;
 
         // --- State Management ---
         function saveState() {
-            localStorage.setItem('tradeTrackerData', JSON.stringify({ tradeHistory, appSettings, balanceData, lastTradeStats, cardStates, discrepancyHistory, cumulativeBalanceHistory, projectedGrowthHistory }));
+            localStorage.setItem('tradeTrackerData', JSON.stringify({ tradeHistory, appSettings, balanceData, lastTradeStats, cardStates, discrepancyHistory, cumulativeBalanceHistory, projectedGrowthHistory, activeChartViews }));
         }
 
         function loadState(dataToLoad = null) {
@@ -476,6 +536,7 @@ Effective trading volume ${volExample} ${currency}`;
             discrepancyHistory = data.discrepancyHistory || [];
             cumulativeBalanceHistory = data.cumulativeBalanceHistory || [];
             projectedGrowthHistory = data.projectedGrowthHistory || [];
+            activeChartViews = { ...DEFAULT_ACTIVE_CHART_VIEWS, ...(data.activeChartViews || {}) };
         }
 
         function updateUiFromState() {
@@ -496,6 +557,19 @@ Effective trading volume ${volExample} ${currency}`;
             document.getElementById('actualCurrentBalance').value = balanceData.actualBalance;
             document.documentElement.setAttribute('data-bs-theme', appSettings.theme);
             toggleProjectionInputs(appSettings.selectedProjectionMethod);
+
+            // NEW: Update active state of chart toggle buttons
+            for (const card in activeChartViews) {
+                const type = activeChartViews[card];
+                const buttons = document.querySelectorAll(`.chart-toggle-buttons .btn[data-chart-card="${card}"]`);
+                buttons.forEach(btn => {
+                    if (btn.dataset.chartType === type) {
+                        btn.classList.add('active');
+                    } else {
+                        btn.classList.remove('active');
+                    }
+                });
+            }
 
             for (const cardId in cardStates) {
                 const card = document.getElementById(cardId);
@@ -641,7 +715,6 @@ Effective trading volume ${volExample} ${currency}`;
                 
                 const pnlNeededThisMonth = monthlyTargetCrypto - totalPnL;
                 
-                // LOGIC CHANGE: Replaced "Wallet Balance Needed" with "Required Avg. Trade Size"
                 if (pnlNeededThisMonth > 0 && avgRoi > 0 && appSettings.tradesPerDay > 0 && daysLeftInMonth > 0) {
                     const requiredPnlPerDay = pnlNeededThisMonth / daysLeftInMonth;
                     const requiredPnlPerTrade = requiredPnlPerDay / appSettings.tradesPerDay;
@@ -689,7 +762,6 @@ Effective trading volume ${volExample} ${currency}`;
             document.getElementById('goalTotalGains').textContent = formatCombinedCurrency(totalPnL, appSettings.cryptoPhpRate);
             document.getElementById('goalDaysRemainingLinear').textContent = formatDays(daysRemainingLinear);
             document.getElementById('goalDaysRemainingProjection').textContent = formatDays(daysRemainingProjection);
-            // LOGIC CHANGE: Update the new element
             document.getElementById('goalRequiredAvgTradeSize').textContent = formatCombinedCurrency(requiredAvgTradeSize, appSettings.cryptoPhpRate);
             document.getElementById('daysRemainingVolumeTarget').textContent = formatDays(daysToVolumeTarget);
 
@@ -717,140 +789,207 @@ Effective trading volume ${volExample} ${currency}`;
 
         function initializeCharts() {
             Chart.register(noDataPlugin);
-
-            const commonLineOptions = {
-                responsive: true, maintainAspectRatio: false,
-                scales: { y: { beginAtZero: false, ticks: { callback: value => formatCurrency(value) } }, x: { title: { display: true } } },
-                plugins: { tooltip: { callbacks: { label: context => `${context.dataset.label}: ${formatCurrency(context.parsed.y)}` } } }
-            };
-            
-            monthlyPnLChart = new Chart('monthlyPnLChart', { type: 'line', data: { datasets: [{ label: 'Monthly PNL', tension: 0.1, fill: false }] }, options: { ...commonLineOptions, scales: { ...commonLineOptions.scales, x: { ...commonLineOptions.scales.x, title: { ...commonLineOptions.scales.x.title, text: 'Month' } } } } });
-            monthlyVolumeChart = new Chart('monthlyVolumeChart', { type: 'bar', data: { datasets: [{ label: 'Monthly Trade Volume' }] }, options: { ...commonLineOptions, scales: { ...commonLineOptions.scales, x: { ...commonLineOptions.scales.x, title: { ...commonLineOptions.scales.x.title, text: 'Month' } } } } });
-            dailyRoiChart = new Chart('dailyRoiChart', { type: 'line', data: { datasets: [{ label: 'Daily ROI (%)', borderColor: 'rgb(255, 159, 64)', tension: 0.1 }] }, options: { ...commonLineOptions, scales: { y: { ticks: { callback: value => value.toFixed(2) + ' %' } }, x: { ...commonLineOptions.scales.x, title: { ...commonLineOptions.scales.x.title, text: 'Date' } } } } });
-            dailyVolumeChart = new Chart('dailyVolumeChart', { type: 'line', data: { datasets: [{ label: 'Daily Trade Volume', borderColor: 'rgb(54, 162, 235)', tension: 0.1 }] }, options: { ...commonLineOptions, scales: { ...commonLineOptions.scales, x: { ...commonLineOptions.scales.x, title: { ...commonLineOptions.scales.x.title, text: 'Date' } } } } });
-            discrepancyChart = new Chart('discrepancyChart', { type: 'line', data: { datasets: [{ label: 'Balance Discrepancy', borderColor: 'rgb(255, 99, 132)', tension: 0.1 }] }, options: { ...commonLineOptions, scales: { ...commonLineOptions.scales, x: { ...commonLineOptions.scales.x, title: { ...commonLineOptions.scales.x.title, text: 'Time of Update' } } } } });
-            cumulativeBalanceChart = new Chart('cumulativeBalanceChart', { type: 'line', data: { datasets: [{ label: 'Cumulative Balance', tension: 0.1, fill: true, backgroundColor: 'rgba(75, 192, 192, 0.2)' }] }, options: { ...commonLineOptions, scales: { ...commonLineOptions.scales, x: { ...commonLineOptions.scales.x, title: { ...commonLineOptions.scales.x.title, text: 'Time' } } } } });
-            projectedGrowthChart = new Chart('projectedGrowthChart', {
-                type: 'line',
-                data: {
-                    labels: [],
-                    datasets: [
-                        { label: 'Projected Balance', data: [], borderColor: 'rgb(0, 123, 255)', borderDash: [5, 5], tension: 0.1, pointRadius: 0 },
-                        { label: 'Actual Cumulative Balance', data: [], borderColor: 'rgb(40, 167, 69)', tension: 0.1, pointRadius: 3 }
-                    ]
-                },
-                options: { ...commonLineOptions, scales: { ...commonLineOptions.scales, x: { ...commonLineOptions.scales.x, title: { ...commonLineOptions.scales.x.title, text: 'Date' } } } }
-            });
-            
-            pnlByDayChart = new Chart('pnlByDayChart', { type: 'bar', data: { datasets: [{ label: 'Daily PNL' }] }, options: { ...commonLineOptions, scales: { ...commonLineOptions.scales, x: { ...commonLineOptions.scales.x, title: { ...commonLineOptions.scales.x.title, text: 'Date' } } } } });
-            pnlByAssetChart = new Chart('pnlByAssetChart', { type: 'bar', data: { datasets: [{ label: 'Total PNL', backgroundColor: 'rgba(75, 192, 192, 0.6)' }, { label: 'Win Rate (%)', type: 'line', yAxisID: 'y1', borderColor: 'rgb(255, 159, 64)', tension: 0.1 }] }, options: { ...commonLineOptions, scales: { ...commonLineOptions.scales, x: { ...commonLineOptions.scales.x, title: { ...commonLineOptions.scales.x.title, text: 'Asset' } }, y1: { type: 'linear', display: true, position: 'right', grid: { drawOnChartArea: false }, ticks: { callback: value => value.toFixed(1) + '%' } } } } });
-            avgWinLossChart = new Chart('avgWinLossChart', { type: 'bar', data: { datasets: [{ label: 'Average Amount' }] }, options: { ...commonLineOptions, scales: { ...commonLineOptions.scales, x: { ...commonLineOptions.scales.x, title: { text: 'Outcome' } } } } });
+            // Charts are now initialized on-demand, so this function is simpler.
         }
 
-        function updateCharts(filteredTrades) {
-            const monthlyData = {};
-            const dailyData = {};
-            const pnlByAsset = {};
-            let totalWinsPnl = 0, winCount = 0, totalLossesPnl = 0, lossCount = 0;
-            const dayMap = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-             const dayColors = {
-                'Sun': 'rgba(255, 99, 132, 0.7)', 'Mon': 'rgba(54, 162, 235, 0.7)', 'Tue': 'rgba(255, 206, 86, 0.7)',
-                'Wed': 'rgba(75, 192, 192, 0.7)', 'Thu': 'rgba(153, 102, 255, 0.7)', 'Fri': 'rgba(255, 159, 64, 0.7)',
-                'Sat': 'rgba(99, 255, 132, 0.7)'
-            };
+        function renderChart(chartInstance, canvasId, config) {
+            if (chartInstance) {
+                chartInstance.destroy();
+            }
+            const ctx = document.getElementById(canvasId).getContext('2d');
+            return new Chart(ctx, config);
+        }
 
+        // --- NEW: Consolidated Chart Update Logic ---
+        function updateCharts(filteredTrades) {
+            // This function now delegates to the specific chart renderers based on active view
+            renderHubChart(filteredTrades);
+            renderPeriodicChart(filteredTrades);
+            renderMetricsChart(filteredTrades);
+        }
+
+        function renderHubChart(filteredTrades) {
+            const chartType = activeChartViews.hub;
+            let config;
+
+            switch (chartType) {
+                case 'cumulative':
+                    let runningBalance = appSettings.startingBalance;
+                    const cumulativeData = filteredTrades.map(trade => {
+                        runningBalance += (trade.pnl || 0);
+                        return { time: trade.time, balance: runningBalance };
+                    });
+                    config = {
+                        type: 'line',
+                        data: {
+                            labels: cumulativeData.map(e => new Date(e.time).toLocaleString()),
+                            datasets: [{ label: 'Cumulative Balance', data: cumulativeData.map(e => e.balance), tension: 0.1, fill: true, backgroundColor: 'rgba(75, 192, 192, 0.2)', borderColor: 'rgb(75, 192, 192)' }]
+                        },
+                        options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: false, ticks: { callback: value => formatCurrency(value) } }, x: { title: { display: true, text: 'Time' } } } }
+                    };
+                    break;
+                
+                case 'projection':
+                     let runningBal = appSettings.startingBalance;
+                     const actualData = filteredTrades.map(trade => {
+                        runningBal += (trade.pnl || 0);
+                        return { time: trade.time, balance: runningBal };
+                    });
+                     const actualLabels = actualData.map(e => e.time.split('T')[0]);
+                     const projectedLabels = projectedGrowthHistory.map(e => e.time.split('T')[0]);
+                     const combinedLabels = [...new Set([...actualLabels, ...projectedLabels])].sort();
+                    config = {
+                        type: 'line',
+                        data: {
+                            labels: combinedLabels,
+                            datasets: [
+                                { label: 'Projected Balance', data: combinedLabels.map(date => projectedGrowthHistory.find(e => e.time.startsWith(date))?.balance ?? null), borderColor: 'rgb(0, 123, 255)', borderDash: [5, 5], tension: 0.1, pointRadius: 0 },
+                                { label: 'Actual Balance', data: combinedLabels.map(date => actualData.slice().reverse().find(e => e.time.startsWith(date))?.balance ?? null), borderColor: 'rgb(40, 167, 69)', tension: 0.1, pointRadius: 3, fill: true, backgroundColor: 'rgba(40, 167, 69, 0.1)' }
+                            ]
+                        },
+                        options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: false, ticks: { callback: value => formatCurrency(value) } }, x: { title: { display: true, text: 'Date' } } } }
+                    };
+                    break;
+
+                case 'discrepancy':
+                    config = {
+                        type: 'line',
+                        data: {
+                            labels: discrepancyHistory.map(e => new Date(e.time).toLocaleTimeString()),
+                            datasets: [{ label: 'Balance Discrepancy', data: discrepancyHistory.map(e => e.value), borderColor: 'rgb(255, 99, 132)', tension: 0.1 }]
+                        },
+                        options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: false, ticks: { callback: value => formatCurrency(value) } }, x: { title: { display: true, text: 'Time of Update' } } } }
+                    };
+                    break;
+            }
+            hubChart = renderChart(hubChart, 'hubChartCanvas', config);
+        }
+
+        function renderPeriodicChart(filteredTrades) {
+            const chartType = activeChartViews.periodic;
+            let config;
+            const dailyData = {};
             filteredTrades.forEach(trade => {
                 const tradeDate = new Date(trade.time);
                 if (isNaN(tradeDate.getTime())) return;
-                
-                const yearMonth = `${tradeDate.getFullYear()}-${(tradeDate.getMonth() + 1).toString().padStart(2, '0')}`;
-                const fullDate = `${yearMonth}-${tradeDate.getDate().toString().padStart(2, '0')}`;
-                monthlyData[yearMonth] = monthlyData[yearMonth] || { pnl: 0, volume: 0 };
-                monthlyData[yearMonth].pnl += (trade.pnl || 0);
-                monthlyData[yearMonth].volume += (trade.effectiveVolume || 0);
+                const fullDate = `${tradeDate.getFullYear()}-${(tradeDate.getMonth() + 1).toString().padStart(2, '0')}-${tradeDate.getDate().toString().padStart(2, '0')}`;
                 dailyData[fullDate] = dailyData[fullDate] || { pnl: 0, volume: 0, roiSum: 0, roiCount: 0 };
                 dailyData[fullDate].pnl += (trade.pnl || 0);
-                dailyData[fullDate].volume += (trade.effectiveVolume || 0);
                 dailyData[fullDate].roiSum += (trade.roi || 0);
                 dailyData[fullDate].roiCount++;
-
-                if (!pnlByAsset[trade.pair]) {
-                    pnlByAsset[trade.pair] = { pnl: 0, wins: 0, losses: 0 };
-                }
-                pnlByAsset[trade.pair].pnl += (trade.pnl || 0);
-                if ((trade.pnl || 0) >= 0) {
-                    pnlByAsset[trade.pair].wins++;
-                    totalWinsPnl += trade.pnl;
-                    winCount++;
-                } else {
-                    pnlByAsset[trade.pair].losses++;
-                    totalLossesPnl += trade.pnl;
-                    lossCount++;
-                }
             });
-            
-            let runningBalance = appSettings.startingBalance;
-            const filteredCumulativeBalance = filteredTrades.map(trade => {
-                runningBalance += (trade.pnl || 0);
-                return { time: trade.time, balance: runningBalance };
-            });
-
-            const sortedMonths = Object.keys(monthlyData).sort();
-            monthlyPnLChart.data.labels = sortedMonths;
-            monthlyPnLChart.data.datasets[0].data = sortedMonths.map(m => monthlyData[m].pnl);
-            monthlyVolumeChart.data.labels = sortedMonths;
-            monthlyVolumeChart.data.datasets[0].data = sortedMonths.map(m => monthlyData[m].volume);
-
             const sortedDates = Object.keys(dailyData).sort();
-            dailyVolumeChart.data.labels = sortedDates;
-            dailyVolumeChart.data.datasets[0].data = sortedDates.map(d => dailyData[d].volume);
-            dailyRoiChart.data.labels = sortedDates;
-            dailyRoiChart.data.datasets[0].data = sortedDates.map(d => dailyData[d].roiCount > 0 ? dailyData[d].roiSum / dailyData[d].roiCount : 0);
 
-            discrepancyChart.data.labels = discrepancyHistory.map(e => new Date(e.time).toLocaleTimeString());
-            discrepancyChart.data.datasets[0].data = discrepancyHistory.map(e => e.value);
+            switch (chartType) {
+                case 'monthlyPnl':
+                    const monthlyData = {};
+                    filteredTrades.forEach(trade => {
+                        const tradeDate = new Date(trade.time);
+                        if (isNaN(tradeDate.getTime())) return;
+                        const yearMonth = `${tradeDate.getFullYear()}-${(tradeDate.getMonth() + 1).toString().padStart(2, '0')}`;
+                        monthlyData[yearMonth] = monthlyData[yearMonth] || { pnl: 0 };
+                        monthlyData[yearMonth].pnl += (trade.pnl || 0);
+                    });
+                    const sortedMonths = Object.keys(monthlyData).sort();
+                    config = {
+                        type: 'line',
+                        data: {
+                            labels: sortedMonths,
+                            datasets: [{ label: 'Monthly PNL', data: sortedMonths.map(m => monthlyData[m].pnl), tension: 0.1, fill: false, borderColor: 'rgb(75, 192, 192)' }]
+                        },
+                        options: { responsive: true, maintainAspectRatio: false, scales: { y: { ticks: { callback: value => formatCurrency(value) } }, x: { title: { display: true, text: 'Month' } } } }
+                    };
+                    break;
+                case 'dailyPnl':
+                     const dayMap = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+                     const dayColors = { 'Sun': 'rgba(255, 99, 132, 0.7)', 'Mon': 'rgba(54, 162, 235, 0.7)', 'Tue': 'rgba(255, 206, 86, 0.7)', 'Wed': 'rgba(75, 192, 192, 0.7)', 'Thu': 'rgba(153, 102, 255, 0.7)', 'Fri': 'rgba(255, 159, 64, 0.7)', 'Sat': 'rgba(99, 255, 132, 0.7)' };
+                    config = {
+                        type: 'bar',
+                        data: {
+                            labels: sortedDates,
+                            datasets: [{ label: 'Daily PNL', data: sortedDates.map(d => dailyData[d].pnl), backgroundColor: sortedDates.map(dateStr => dayColors[dayMap[new Date(dateStr).getUTCDay()]]) }]
+                        },
+                        options: { responsive: true, maintainAspectRatio: false, scales: { y: { ticks: { callback: value => formatCurrency(value) } }, x: { title: { display: true, text: 'Date' } } } }
+                    };
+                    break;
+                case 'dailyRoi':
+                    config = {
+                        type: 'line',
+                        data: {
+                            labels: sortedDates,
+                            datasets: [{ label: 'Daily ROI (%)', data: sortedDates.map(d => dailyData[d].roiCount > 0 ? dailyData[d].roiSum / dailyData[d].roiCount : 0), borderColor: 'rgb(255, 159, 64)', tension: 0.1 }]
+                        },
+                        options: { responsive: true, maintainAspectRatio: false, scales: { y: { ticks: { callback: value => value.toFixed(2) + ' %' } }, x: { title: { display: true, text: 'Date' } } } }
+                    };
+                    break;
+            }
+            periodicChart = renderChart(periodicChart, 'periodicChartCanvas', config);
+        }
 
-            cumulativeBalanceChart.data.labels = filteredCumulativeBalance.map(e => new Date(e.time).toLocaleString());
-            cumulativeBalanceChart.data.datasets[0].data = filteredCumulativeBalance.map(e => e.balance);
+        function renderMetricsChart(filteredTrades) {
+            const chartType = activeChartViews.metrics;
+            let config;
 
-            const actualLabels = filteredCumulativeBalance.map(e => e.time.split('T')[0]);
-            const projectedLabels = projectedGrowthHistory.map(e => e.time.split('T')[0]);
-            const combinedLabels = [...new Set([...actualLabels, ...projectedLabels])].sort();
-            
-            projectedGrowthChart.data.labels = combinedLabels;
-            projectedGrowthChart.data.datasets[0].data = combinedLabels.map(date => {
-                const entry = projectedGrowthHistory.find(e => e.time.startsWith(date));
-                return entry ? entry.balance : null;
-            });
-            projectedGrowthChart.data.datasets[1].data = combinedLabels.map(date => {
-                const entry = filteredCumulativeBalance.slice().reverse().find(e => e.time.startsWith(date));
-                return entry ? entry.balance : null;
-            });
-            
-            pnlByDayChart.data.labels = sortedDates;
-            pnlByDayChart.data.datasets[0].data = sortedDates.map(d => dailyData[d].pnl);
-            pnlByDayChart.data.datasets[0].backgroundColor = sortedDates.map(dateStr => {
-                const date = new Date(dateStr);
-                const dayOfWeek = dayMap[date.getUTCDay()];
-                return dayColors[dayOfWeek];
-            });
-
-            const sortedAssets = Object.keys(pnlByAsset).sort((a, b) => pnlByAsset[b].pnl - pnlByAsset[a].pnl);
-            pnlByAssetChart.data.labels = sortedAssets;
-            pnlByAssetChart.data.datasets[0].data = sortedAssets.map(asset => pnlByAsset[asset].pnl);
-            pnlByAssetChart.data.datasets[1].data = sortedAssets.map(asset => {
-                const stats = pnlByAsset[asset];
-                const total = stats.wins + stats.losses;
-                return total > 0 ? (stats.wins / total) * 100 : 0;
-            });
-
-            const avgWin = winCount > 0 ? totalWinsPnl / winCount : 0;
-            const avgLoss = lossCount > 0 ? totalLossesPnl / lossCount : 0;
-            avgWinLossChart.data.labels = ['Average Win', 'Average Loss'];
-            avgWinLossChart.data.datasets[0].data = [avgWin, avgLoss];
-            avgWinLossChart.data.datasets[0].backgroundColor = ['rgba(75, 192, 192, 0.6)', 'rgba(255, 99, 132, 0.6)'];
-
-            [monthlyPnLChart, monthlyVolumeChart, dailyVolumeChart, dailyRoiChart, discrepancyChart, cumulativeBalanceChart, projectedGrowthChart, pnlByDayChart, pnlByAssetChart, avgWinLossChart].forEach(chart => { if(chart) chart.update() });
+            switch (chartType) {
+                case 'byAsset':
+                    const pnlByAsset = {};
+                    filteredTrades.forEach(trade => {
+                        if (!pnlByAsset[trade.pair]) pnlByAsset[trade.pair] = { pnl: 0, wins: 0, losses: 0 };
+                        pnlByAsset[trade.pair].pnl += (trade.pnl || 0);
+                        if ((trade.pnl || 0) >= 0) pnlByAsset[trade.pair].wins++;
+                        else pnlByAsset[trade.pair].losses++;
+                    });
+                    const sortedAssets = Object.keys(pnlByAsset).sort((a, b) => pnlByAsset[b].pnl - pnlByAsset[a].pnl);
+                    config = {
+                        type: 'bar',
+                        data: {
+                            labels: sortedAssets,
+                            datasets: [
+                                { label: 'Total PNL', data: sortedAssets.map(asset => pnlByAsset[asset].pnl), backgroundColor: 'rgba(75, 192, 192, 0.6)' },
+                                { label: 'Win Rate (%)', data: sortedAssets.map(asset => { const stats = pnlByAsset[asset]; return (stats.wins + stats.losses > 0) ? (stats.wins / (stats.wins + stats.losses)) * 100 : 0; }), type: 'line', yAxisID: 'y1', borderColor: 'rgb(255, 159, 64)', tension: 0.1 }
+                            ]
+                        },
+                        options: { responsive: true, maintainAspectRatio: false, scales: { y: { ticks: { callback: value => formatCurrency(value) } }, x: { title: { display: true, text: 'Asset' } }, y1: { type: 'linear', display: true, position: 'right', grid: { drawOnChartArea: false }, ticks: { callback: value => value.toFixed(1) + '%' } } } }
+                    };
+                    break;
+                case 'avgWinLoss':
+                    let totalWinsPnl = 0, winCount = 0, totalLossesPnl = 0, lossCount = 0;
+                     filteredTrades.forEach(trade => {
+                        if ((trade.pnl || 0) >= 0) { totalWinsPnl += trade.pnl; winCount++; }
+                        else { totalLossesPnl += trade.pnl; lossCount++; }
+                    });
+                    const avgWin = winCount > 0 ? totalWinsPnl / winCount : 0;
+                    const avgLoss = lossCount > 0 ? totalLossesPnl / lossCount : 0;
+                    config = {
+                        type: 'bar',
+                        data: {
+                            labels: ['Average Win', 'Average Loss'],
+                            datasets: [{ label: 'Average Amount', data: [avgWin, avgLoss], backgroundColor: ['rgba(75, 192, 192, 0.6)', 'rgba(255, 99, 132, 0.6)'] }]
+                        },
+                        options: { responsive: true, maintainAspectRatio: false, scales: { y: { ticks: { callback: value => formatCurrency(value) } }, x: { title: { display: true, text: 'Outcome' } } } }
+                    };
+                    break;
+                case 'monthlyVolume':
+                    const monthlyVolData = {};
+                    filteredTrades.forEach(trade => {
+                        const tradeDate = new Date(trade.time);
+                        if (isNaN(tradeDate.getTime())) return;
+                        const yearMonth = `${tradeDate.getFullYear()}-${(tradeDate.getMonth() + 1).toString().padStart(2, '0')}`;
+                        monthlyVolData[yearMonth] = monthlyVolData[yearMonth] || { volume: 0 };
+                        monthlyVolData[yearMonth].volume += (trade.effectiveVolume || 0);
+                    });
+                    const sortedVolMonths = Object.keys(monthlyVolData).sort();
+                    config = {
+                        type: 'bar',
+                        data: {
+                            labels: sortedVolMonths,
+                            datasets: [{ label: 'Monthly Trade Volume', data: sortedVolMonths.map(m => monthlyVolData[m].volume), backgroundColor: 'rgba(54, 162, 235, 0.6)' }]
+                        },
+                        options: { responsive: true, maintainAspectRatio: false, scales: { y: { ticks: { callback: value => formatCurrency(value) } }, x: { title: { display: true, text: 'Month' } } } }
+                    };
+                    break;
+            }
+            metricsChart = renderChart(metricsChart, 'metricsChartCanvas', config);
         }
 
         // --- Data Parsing & Handling ---
@@ -940,7 +1079,14 @@ Effective trading volume ${volExample} ${currency}`;
                     scrollTo: true
                 }
             });
-            tour.addStep({ title: 'Welcome!', text: 'This is a quick tour of your dashboard. Let\'s get you set up.', buttons: [{ text: 'Next', action: tour.next }] });
+
+            tour.addStep({
+                title: 'Welcome!',
+                text: 'This is a quick tour of your dashboard. Let\'s get you set up.',
+                buttons: [{ text: 'Next', action: tour.next }],
+                classes: 'shepherd-step-welcome' // Special class for the first step
+            });
+
             tour.addStep({ title: 'Step 1: Financial Settings', text: 'First, select your trading currency, enter your starting balance, target income, and the current Crypto/PHP rate here.', attachTo: { element: '#financialGoalsCard', on: window.innerWidth < 768 ? 'bottom' : 'top' }, buttons: [{ text: 'Back', action: tour.back }, { text: 'Next', action: tour.next }] });
             tour.addStep({ title: 'Step 2: Add Your Trades', text: 'Now, paste your trade history into this box. Make sure the currency matches what you selected in settings.', attachTo: { element: '#dataInputCard', on: window.innerWidth < 768 ? 'bottom' : 'right' }, buttons: [{ text: 'Back', action: tour.back }, { text: 'Next', action: tour.next }] });
             tour.addStep({ title: 'Step 3: Update Your Balance', text: 'Finally, enter your actual current wallet balance here. The dashboard will calculate any discrepancy for you.', attachTo: { element: '#balanceOverviewCard', on: 'bottom' }, buttons: [{ text: 'Back', action: tour.back }, { text: 'Done', action: tour.complete }] });
@@ -1096,6 +1242,23 @@ Effective trading volume ${volExample} ${currency}`;
                 appSettings.selectedProjectionMethod = e.target.value;
                 toggleProjectionInputs(e.target.value);
                 updateAllMetrics();
+            });
+
+            // NEW: Chart toggle button listener
+            document.querySelectorAll('.chart-toggle-buttons .btn').forEach(button => {
+                button.addEventListener('click', (e) => {
+                    const { chartCard, chartType } = e.target.dataset;
+                    
+                    // Update active state in memory
+                    activeChartViews[chartCard] = chartType;
+
+                    // Update button visual state
+                    document.querySelectorAll(`.chart-toggle-buttons .btn[data-chart-card="${chartCard}"]`).forEach(btn => btn.classList.remove('active'));
+                    e.target.classList.add('active');
+
+                    // Re-render the specific chart and save state
+                    updateAllMetrics();
+                });
             });
 
             document.querySelectorAll('.collapse').forEach(el => {
