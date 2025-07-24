@@ -275,6 +275,7 @@
                                 <button type="button" class="btn btn-outline-primary" data-chart-card="periodic" data-chart-type="monthlyPnl">Monthly PNL</button>
                                 <button type="button" class="btn btn-outline-primary" data-chart-card="periodic" data-chart-type="dailyPnl">Daily PNL</button>
                                 <button type="button" class="btn btn-outline-primary" data-chart-card="periodic" data-chart-type="dailyRoi">Daily ROI</button>
+                                <button type="button" class="btn btn-outline-primary" data-chart-card="periodic" data-chart-type="dailyTradeCount">Trade Count</button>
                             </div>
                         </div>
                     </div>
@@ -920,6 +921,55 @@ Effective trading volume ${volExample} ${currency}`;
                             datasets: [{ label: 'Daily ROI (%)', data: sortedDates.map(d => dailyData[d].roiCount > 0 ? dailyData[d].roiSum / dailyData[d].roiCount : 0), borderColor: 'rgb(255, 159, 64)', tension: 0.1 }]
                         },
                         options: { responsive: true, maintainAspectRatio: false, scales: { y: { ticks: { callback: value => value.toFixed(2) + ' %' } }, x: { title: { display: true, text: 'Date' } } } }
+                    };
+                    break;
+                case 'dailyTradeCount':
+                    config = {
+                        type: 'bar',
+                        data: {
+                            labels: sortedDates,
+                            datasets: [
+                                {
+                                    label: 'Daily Trade Count',
+                                    data: sortedDates.map(d => dailyData[d].roiCount),
+                                    backgroundColor: 'rgba(153, 102, 255, 0.6)',
+                                    order: 2
+                                },
+                                {
+                                    label: 'Daily Target',
+                                    data: sortedDates.map(() => appSettings.tradesPerDay),
+                                    type: 'line',
+                                    borderColor: 'rgb(255, 99, 132)',
+                                    borderWidth: 2,
+                                    pointRadius: 0,
+                                    fill: false,
+                                    tension: 0,
+                                    order: 1
+                                }
+                            ]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    ticks: {
+                                        stepSize: 1
+                                    },
+                                    title: {
+                                        display: true,
+                                        text: 'Number of Trades'
+                                    }
+                                },
+                                x: {
+                                    title: {
+                                        display: true,
+                                        text: 'Date'
+                                    }
+                                }
+                            }
+                        }
                     };
                     break;
             }
