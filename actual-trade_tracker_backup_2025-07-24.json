@@ -1,0 +1,387 @@
+{
+  "tradeHistory": [
+    {
+      "currency": "USDT",
+      "pair": "BTC/USDT",
+      "orderNo": "579224314446912",
+      "time": "2025-07-18 18:42",
+      "pnl": 2.27,
+      "roi": 74.92,
+      "effectiveVolume": 3.03
+    },
+    {
+      "currency": "USDT",
+      "pair": "BTC/USDT",
+      "orderNo": "579295468434752",
+      "time": "2025-07-19 14:00",
+      "pnl": 2.28,
+      "roi": 74.75,
+      "effectiveVolume": 3.05
+    },
+    {
+      "currency": "USDT",
+      "pair": "BTC/USDT",
+      "orderNo": "579314097943136",
+      "time": "2025-07-19 19:03",
+      "pnl": 2.59,
+      "roi": 84.09,
+      "effectiveVolume": 3.08
+    },
+    {
+      "currency": "USDT",
+      "pair": "BTC/USDT",
+      "orderNo": "579402433631680",
+      "time": "2025-07-20 19:01",
+      "pnl": 2.31,
+      "roi": 74.52,
+      "effectiveVolume": 3.1
+    },
+    {
+      "currency": "USDT",
+      "pair": "BTC/USDT",
+      "orderNo": "579472662292512",
+      "time": "2025-07-21 14:04",
+      "pnl": 2.33,
+      "roi": 74.68,
+      "effectiveVolume": 3.12
+    },
+    {
+      "currency": "USDT",
+      "pair": "BTC/USDT",
+      "orderNo": "579491036436768",
+      "time": "2025-07-21 19:03",
+      "pnl": 2.22,
+      "roi": 70.48,
+      "effectiveVolume": 3.15
+    },
+    {
+      "currency": "USDT",
+      "pair": "BTC/USDT",
+      "orderNo": "579560936608960",
+      "time": "2025-07-22 14:01",
+      "pnl": 2.3,
+      "roi": 72.56,
+      "effectiveVolume": 3.17
+    },
+    {
+      "currency": "USDT",
+      "pair": "BTC/USDT",
+      "orderNo": "579579592027456",
+      "time": "2025-07-22 19:04",
+      "pnl": 2.36,
+      "roi": 73.98,
+      "effectiveVolume": 3.19
+    },
+    {
+      "currency": "USDT",
+      "pair": "BTC/USDT",
+      "orderNo": "579649545002400",
+      "time": "2025-07-23 14:03",
+      "pnl": 2.38,
+      "roi": 73.91,
+      "effectiveVolume": 3.22
+    },
+    {
+      "currency": "USDT",
+      "pair": "BTC/USDT",
+      "orderNo": "579667984794976",
+      "time": "2025-07-23 19:03",
+      "pnl": 2.42,
+      "roi": 74.69,
+      "effectiveVolume": 3.24
+    },
+    {
+      "currency": "USDT",
+      "pair": "BTC/USDT",
+      "orderNo": "579738196229376",
+      "time": "2025-07-24 14:06",
+      "pnl": 2.37,
+      "roi": 72.7,
+      "effectiveVolume": 3.26
+    }
+  ],
+  "appSettings": {
+    "cryptoPhpRate": 56.68,
+    "targetMonthlyIncomePhp": 50000,
+    "startingBalance": 300.48,
+    "projectedGainPerTrade": 1,
+    "tradesPerDay": 2,
+    "projectionPeriodDays": 15,
+    "projectedTradeAmount": 3,
+    "projectedRoiPerTrade": 70,
+    "selectedProjectionMethod": "percent",
+    "theme": "light",
+    "schedulePlanner": "",
+    "targetTradingVolume": 300,
+    "selectedCrypto": "USDT"
+  },
+  "balanceData": {
+    "previousBalance": 323.94,
+    "calculatedBalance": 326.31,
+    "actualBalance": 329.31
+  },
+  "lastTradeStats": {
+    "currentGain": 2.37,
+    "currentRoi": 72.7,
+    "previousGain": 2.42,
+    "lastTradeAmount": 3.26,
+    "previousTradeAmount": 3.24
+  },
+  "cardStates": {
+    "projectionSettingsCard": "expanded"
+  },
+  "discrepancyHistory": [
+    {
+      "time": "2025-07-24T09:25:13.380Z",
+      "value": -319.14000000000004
+    },
+    {
+      "time": "2025-07-24T09:25:25.233Z",
+      "value": 2.999999999999943
+    },
+    {
+      "time": "2025-07-24T09:25:33.328Z",
+      "value": 2.999999999999943
+    },
+    {
+      "time": "2025-07-24T09:25:48.077Z",
+      "value": 2.999999999999943
+    },
+    {
+      "time": "2025-07-24T09:25:49.009Z",
+      "value": 2.999999999999943
+    },
+    {
+      "time": "2025-07-24T09:26:11.005Z",
+      "value": 0.6199999999999477
+    },
+    {
+      "time": "2025-07-24T09:26:23.660Z",
+      "value": -1.8000000000000114
+    },
+    {
+      "time": "2025-07-24T09:26:34.509Z",
+      "value": -4.170000000000016
+    },
+    {
+      "time": "2025-07-24T09:28:18.368Z",
+      "value": 3
+    },
+    {
+      "time": "2025-07-24T09:30:21.538Z",
+      "value": 3
+    },
+    {
+      "time": "2025-07-24T09:30:23.322Z",
+      "value": 3
+    },
+    {
+      "time": "2025-07-24T09:30:24.515Z",
+      "value": 3
+    },
+    {
+      "time": "2025-07-24T09:30:25.638Z",
+      "value": 3
+    },
+    {
+      "time": "2025-07-24T09:30:26.423Z",
+      "value": 3
+    },
+    {
+      "time": "2025-07-24T09:30:33.365Z",
+      "value": 3
+    },
+    {
+      "time": "2025-07-24T09:30:37.927Z",
+      "value": 3
+    },
+    {
+      "time": "2025-07-24T09:30:39.182Z",
+      "value": 3
+    },
+    {
+      "time": "2025-07-24T09:30:39.729Z",
+      "value": 3
+    },
+    {
+      "time": "2025-07-24T09:30:41.255Z",
+      "value": 3
+    },
+    {
+      "time": "2025-07-24T09:30:42.415Z",
+      "value": 3
+    },
+    {
+      "time": "2025-07-24T09:31:03.388Z",
+      "value": 3
+    },
+    {
+      "time": "2025-07-24T09:31:04.221Z",
+      "value": 3
+    },
+    {
+      "time": "2025-07-24T09:31:06.242Z",
+      "value": 3
+    },
+    {
+      "time": "2025-07-24T09:31:07.179Z",
+      "value": 3
+    },
+    {
+      "time": "2025-07-24T09:31:07.820Z",
+      "value": 3
+    },
+    {
+      "time": "2025-07-24T09:31:08.298Z",
+      "value": 3
+    },
+    {
+      "time": "2025-07-24T09:31:30.171Z",
+      "value": 3
+    },
+    {
+      "time": "2025-07-24T09:31:32.652Z",
+      "value": 3
+    },
+    {
+      "time": "2025-07-24T09:31:33.605Z",
+      "value": 3
+    },
+    {
+      "time": "2025-07-24T09:31:34.508Z",
+      "value": 3
+    },
+    {
+      "time": "2025-07-24T09:31:34.974Z",
+      "value": 3
+    },
+    {
+      "time": "2025-07-24T09:31:35.564Z",
+      "value": 3
+    },
+    {
+      "time": "2025-07-24T09:31:36.793Z",
+      "value": 3
+    },
+    {
+      "time": "2025-07-24T09:31:41.385Z",
+      "value": 3
+    },
+    {
+      "time": "2025-07-24T09:31:42.336Z",
+      "value": 3
+    },
+    {
+      "time": "2025-07-24T09:31:48.006Z",
+      "value": 3
+    },
+    {
+      "time": "2025-07-24T09:31:53.155Z",
+      "value": 3
+    },
+    {
+      "time": "2025-07-24T09:32:30.167Z",
+      "value": 3
+    },
+    {
+      "time": "2025-07-24T09:32:39.604Z",
+      "value": 3
+    },
+    {
+      "time": "2025-07-24T09:32:40.969Z",
+      "value": 3
+    },
+    {
+      "time": "2025-07-24T09:32:41.718Z",
+      "value": 3
+    },
+    {
+      "time": "2025-07-24T09:33:24.839Z",
+      "value": 3
+    },
+    {
+      "time": "2025-07-24T09:33:36.890Z",
+      "value": 3
+    },
+    {
+      "time": "2025-07-24T09:33:38.202Z",
+      "value": 3
+    },
+    {
+      "time": "2025-07-24T09:33:39.113Z",
+      "value": 3
+    },
+    {
+      "time": "2025-07-24T09:35:20.202Z",
+      "value": 3
+    }
+  ],
+  "cumulativeBalanceHistory": [],
+  "projectedGrowthHistory": [
+    {
+      "time": "2025-07-24T09:35:20.203Z",
+      "balance": 332.868831
+    },
+    {
+      "time": "2025-07-25T09:35:20.203Z",
+      "balance": 339.55949450310004
+    },
+    {
+      "time": "2025-07-26T09:35:20.203Z",
+      "balance": 346.3846403426124
+    },
+    {
+      "time": "2025-07-27T09:35:20.203Z",
+      "balance": 353.3469716134989
+    },
+    {
+      "time": "2025-07-28T09:35:20.203Z",
+      "balance": 360.44924574293026
+    },
+    {
+      "time": "2025-07-29T09:35:20.203Z",
+      "balance": 367.69427558236316
+    },
+    {
+      "time": "2025-07-30T09:35:20.203Z",
+      "balance": 375.08493052156865
+    },
+    {
+      "time": "2025-07-31T09:35:20.203Z",
+      "balance": 382.6241376250522
+    },
+    {
+      "time": "2025-08-01T09:35:20.203Z",
+      "balance": 390.31488279131577
+    },
+    {
+      "time": "2025-08-02T09:35:20.203Z",
+      "balance": 398.1602119354212
+    },
+    {
+      "time": "2025-08-03T09:35:20.203Z",
+      "balance": 406.1632321953232
+    },
+    {
+      "time": "2025-08-04T09:35:20.203Z",
+      "balance": 414.3271131624492
+    },
+    {
+      "time": "2025-08-05T09:35:20.203Z",
+      "balance": 422.65508813701445
+    },
+    {
+      "time": "2025-08-06T09:35:20.203Z",
+      "balance": 431.15045540856846
+    },
+    {
+      "time": "2025-08-07T09:35:20.203Z",
+      "balance": 439.81657956228065
+    }
+  ],
+  "activeChartViews": {
+    "hub": "projection",
+    "periodic": "dailyRoi",
+    "metrics": "monthlyVolume"
+  }
+}

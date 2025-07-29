@@ -352,11 +352,32 @@
                     </div>
                     <div class="collapse show" id="collapseProjections">
                         <div class="card-body">
-                            <div class="mb-2"><label>Method:</label><select id="projectionMethodSelect" class="form-select form-select-sm"><option value="percent">By % Gain Per Trade</option><option value="fixedRoi">By Fixed Trade Amt & ROI</option></select></div>
+                            <div class="mb-2"><label>Method:</label><select id="projectionMethodSelect" class="form-select form-select-sm">
+                                <option value="percent">By % Gain Per Trade (of current balance)</option>
+                                <option value="dynamicBalancePercent">By % of Balance for Trade Size & ROI</option>
+                            </select></div>
                             <div class="mb-2"><label>Trades Per Day:</label><input type="number" id="tradesPerDayInput" class="form-control form-control-sm"></div>
                             <div class="mb-3"><label>Projection Period (Days):</label><input type="number" id="projectionPeriodDaysInput" class="form-control form-control-sm"></div>
-                            <div id="percentProjectionInputs"><hr><h6 class="text-muted">% Gain Details</h6><div class="mb-2"><label>Projected Gain Per Trade (%):</label><input type="number" id="projectedGainPerTradeInput" class="form-control form-control-sm"></div></div>
-                            <div id="fixedRoiProjectionInputs" style="display: none;"><hr><h6 class="text-muted">Fixed Amount Details</h6><div class="mb-2"><label>Projected Trade Amount (<span class="currency-symbol">USDT</span>):</label><input type="number" id="projectedTradeAmountInput" class="form-control form-control-sm"></div><div class="mb-2"><label>Projected ROI Per Trade (%):</label><input type="number" id="projectedRoiPerTradeInput" class="form-control form-control-sm"></div></div>
+                            <div id="percentProjectionInputs">
+                                <hr>
+                                <h6 class="text-muted">% Gain Details</h6>
+                                <div class="mb-2">
+                                    <label>Projected Gain Per Trade (%):</label>
+                                    <input type="number" id="projectedGainPerTradeInput" class="form-control form-control-sm">
+                                </div>
+                            </div>
+                            <div id="fixedRoiProjectionInputs" style="display: none;">
+                                <hr>
+                                <h6 class="text-muted">Dynamic % of Balance Details</h6>
+                                <div class="mb-2">
+                                    <label>Percentage of Balance for Trade Size:</label>
+                                    <input type="number" id="projectedTradeAmountInput" class="form-control form-control-sm">
+                                </div>
+                                <div class="mb-2">
+                                    <label>Projected ROI Per Trade (%):</label>
+                                    <input type="number" id="projectedRoiPerTradeInput" class="form-control form-control-sm">
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -435,7 +456,8 @@
         let coinList = []; // To store the fetched list of coins
         let resetModal; // Variable to hold the modal instance
 
-        const DEFAULT_APP_SETTINGS = { cryptoPhpRate: 58.90, targetMonthlyIncomePhp: 50000, startingBalance: 301, projectedGainPerTrade: 1, tradesPerDay: 2, projectionPeriodDays: 90, projectedTradeAmount: 3.00, projectedRoiPerTrade: 70, selectedProjectionMethod: 'percent', theme: 'light', schedulePlanner: '', targetTradingVolume: 300, selectedCrypto: 'USDT' };
+        // Updated DEFAULT_APP_SETTINGS to reflect new 'dynamicBalancePercent' method and default percentage
+        const DEFAULT_APP_SETTINGS = { cryptoPhpRate: 58.90, targetMonthlyIncomePhp: 50000, startingBalance: 301, projectedGainPerTrade: 1, tradesPerDay: 2, projectionPeriodDays: 90, projectedTradeAmount: 1.00, projectedRoiPerTrade: 70, selectedProjectionMethod: 'percent', theme: 'light', schedulePlanner: '', targetTradingVolume: 300, selectedCrypto: 'USDT' };
         const DEFAULT_BALANCE_DATA = { previousBalance: 0, calculatedBalance: 0, actualBalance: 0 };
         const DEFAULT_LAST_TRADE_STATS = { currentGain: 0, currentRoi: 0, previousGain: 0, lastTradeAmount: 0, previousTradeAmount: 0 };
         const DEFAULT_CARD_STATES = {};
@@ -499,9 +521,10 @@
             }
         }
 
+        // Updated toggleProjectionInputs to handle 'dynamicBalancePercent'
         function toggleProjectionInputs(method) {
             document.getElementById('percentProjectionInputs').style.display = method === 'percent' ? 'block' : 'none';
-            document.getElementById('fixedRoiProjectionInputs').style.display = method === 'fixedRoi' ? 'block' : 'none';
+            document.getElementById('fixedRoiProjectionInputs').style.display = method === 'dynamicBalancePercent' ? 'block' : 'none';
         }
         
         function updatePlaceholderText() {
@@ -550,7 +573,8 @@ Effective trading volume ${volExample} ${currency}`;
             document.getElementById('tradesPerDayInput').value = appSettings.tradesPerDay;
             document.getElementById('projectionPeriodDaysInput').value = appSettings.projectionPeriodDays;
             document.getElementById('projectedGainPerTradeInput').value = appSettings.projectedGainPerTrade;
-            document.getElementById('projectedTradeAmountInput').value = appSettings.projectedTradeAmount;
+            // projectedTradeAmountInput now stores a percentage
+            document.getElementById('projectedTradeAmountInput').value = appSettings.projectedTradeAmount; 
             document.getElementById('projectedRoiPerTradeInput').value = appSettings.projectedRoiPerTrade;
             document.getElementById('schedulePlannerInput').value = appSettings.schedulePlanner;
             
@@ -606,36 +630,36 @@ Effective trading volume ${volExample} ${currency}`;
 
             let daysToTarget = 0;
             let reachedTarget = false;
-            const maxProjectionCheck = 365 * 5; 
+            const maxProjectionCheck = 365 * 5; // Check up to 5 years for target
 
             for (let i = 0; i < maxProjectionCheck; i++) {
-                let currentDayBalance = projectedBalance;
-                if (i < appSettings.projectionPeriodDays) {
-                    const futureDate = new Date(today);
-                    futureDate.setDate(today.getDate() + i);
-                     for (let j = 0; j < appSettings.tradesPerDay; j++) {
-                        if (appSettings.selectedProjectionMethod === 'percent') {
-                            currentDayBalance += currentDayBalance * (appSettings.projectedGainPerTrade / 100);
-                        } else {
-                            currentDayBalance += appSettings.projectedTradeAmount * (appSettings.projectedRoiPerTrade / 100);
-                        }
+                let currentDayBalanceForPeriod = projectedBalance; // Use a separate variable for daily compounding within the projection period
+                const futureDate = new Date(today);
+                futureDate.setDate(today.getDate() + i);
+
+                for (let j = 0; j < appSettings.tradesPerDay; j++) {
+                    if (appSettings.selectedProjectionMethod === 'percent') {
+                        // This method applies a percentage gain directly to the current projected balance
+                        currentDayBalanceForPeriod += currentDayBalanceForPeriod * (appSettings.projectedGainPerTrade / 100);
+                    } else if (appSettings.selectedProjectionMethod === 'dynamicBalancePercent') {
+                        // Calculate trade size as a percentage of current balance
+                        const tradeSize = currentDayBalanceForPeriod * (appSettings.projectedTradeAmount / 100);
+                        // Calculate PNL based on trade size and projected ROI
+                        const tradePnl = tradeSize * (appSettings.projectedRoiPerTrade / 100);
+                        currentDayBalanceForPeriod += tradePnl;
                     }
-                    projectedGrowthHistory.push({ time: futureDate.toISOString(), balance: currentDayBalance });
                 }
 
-                if (!reachedTarget) {
-                    for (let j = 0; j < appSettings.tradesPerDay; j++) {
-                        if (appSettings.selectedProjectionMethod === 'percent') {
-                            projectedBalance += projectedBalance * (appSettings.projectedGainPerTrade / 100);
-                        } else {
-                            projectedBalance += appSettings.projectedTradeAmount * (appSettings.projectedRoiPerTrade / 100);
-                        }
-                        if (projectedBalance >= targetBalance) {
-                            daysToTarget = i + ((j + 1) / appSettings.tradesPerDay);
-                            reachedTarget = true;
-                            break;
-                        }
-                    }
+                // Update the main projectedBalance for the next day's calculation
+                projectedBalance = currentDayBalanceForPeriod;
+
+                if (i < appSettings.projectionPeriodDays) {
+                    projectedGrowthHistory.push({ time: futureDate.toISOString(), balance: projectedBalance });
+                }
+
+                if (!reachedTarget && projectedBalance >= targetBalance) {
+                    daysToTarget = i + 1; // +1 because it's the end of the day
+                    reachedTarget = true;
                 }
                 
                 if (i >= appSettings.projectionPeriodDays && reachedTarget) break;
@@ -660,7 +684,8 @@ Effective trading volume ${volExample} ${currency}`;
             appSettings.projectedGainPerTrade = parseFloat(document.getElementById('projectedGainPerTradeInput').value) || 0;
             appSettings.tradesPerDay = parseInt(document.getElementById('tradesPerDayInput').value) || 0;
             appSettings.projectionPeriodDays = parseInt(document.getElementById('projectionPeriodDaysInput').value) || 0;
-            appSettings.projectedTradeAmount = parseFloat(document.getElementById('projectedTradeAmountInput').value) || 0;
+            // projectedTradeAmount now stores a percentage for 'dynamicBalancePercent' method
+            appSettings.projectedTradeAmount = parseFloat(document.getElementById('projectedTradeAmountInput').value) || 0; 
             appSettings.projectedRoiPerTrade = parseFloat(document.getElementById('projectedRoiPerTradeInput').value) || 0;
             appSettings.targetTradingVolume = parseFloat(document.getElementById('targetTradingVolume').value) || 0;
             balanceData.actualBalance = parseFloat(document.getElementById('actualCurrentBalance').value) || 0;
@@ -831,14 +856,14 @@ Effective trading volume ${volExample} ${currency}`;
                     break;
                 
                 case 'projection':
-                     let runningBal = appSettings.startingBalance;
-                     const actualData = filteredTrades.map(trade => {
+                    let runningBal = appSettings.startingBalance;
+                    const actualData = filteredTrades.map(trade => {
                         runningBal += (trade.pnl || 0);
                         return { time: trade.time, balance: runningBal };
                     });
-                     const actualLabels = actualData.map(e => e.time.split('T')[0]);
-                     const projectedLabels = projectedGrowthHistory.map(e => e.time.split('T')[0]);
-                     const combinedLabels = [...new Set([...actualLabels, ...projectedLabels])].sort();
+                    const actualLabels = actualData.map(e => e.time.split('T')[0]);
+                    const projectedLabels = projectedGrowthHistory.map(e => e.time.split('T')[0]);
+                    const combinedLabels = [...new Set([...actualLabels, ...projectedLabels])].sort();
                     config = {
                         type: 'line',
                         data: {
@@ -902,8 +927,8 @@ Effective trading volume ${volExample} ${currency}`;
                     };
                     break;
                 case 'dailyPnl':
-                     const dayMap = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-                     const dayColors = { 'Sun': 'rgba(255, 99, 132, 0.7)', 'Mon': 'rgba(54, 162, 235, 0.7)', 'Tue': 'rgba(255, 206, 86, 0.7)', 'Wed': 'rgba(75, 192, 192, 0.7)', 'Thu': 'rgba(153, 102, 255, 0.7)', 'Fri': 'rgba(255, 159, 64, 0.7)', 'Sat': 'rgba(99, 255, 132, 0.7)' };
+                    const dayMap = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+                    const dayColors = { 'Sun': 'rgba(255, 99, 132, 0.7)', 'Mon': 'rgba(54, 162, 235, 0.7)', 'Tue': 'rgba(255, 206, 86, 0.7)', 'Wed': 'rgba(75, 192, 192, 0.7)', 'Thu': 'rgba(153, 102, 255, 0.7)', 'Fri': 'rgba(255, 159, 64, 0.7)', 'Sat': 'rgba(99, 255, 132, 0.7)' };
                     config = {
                         type: 'bar',
                         data: {
@@ -1004,7 +1029,7 @@ Effective trading volume ${volExample} ${currency}`;
                     break;
                 case 'avgWinLoss':
                     let totalWinsPnl = 0, winCount = 0, totalLossesPnl = 0, lossCount = 0;
-                     filteredTrades.forEach(trade => {
+                    filteredTrades.forEach(trade => {
                         if ((trade.pnl || 0) >= 0) { totalWinsPnl += trade.pnl; winCount++; }
                         else { totalLossesPnl += trade.pnl; lossCount++; }
                     });
@@ -1050,6 +1075,7 @@ Effective trading volume ${volExample} ${currency}`;
                 tradeHistoryOutput.innerHTML = '<p class="text-center text-muted m-0">No trades for the selected currency.</p>';
                 return;
             }
+            // Sort trades by time in descending order for display
             [...filteredTrades].sort((a, b) => new Date(b.time) - new Date(a.time)).forEach(trade => {
                 const tradeDiv = document.createElement('div');
                 tradeDiv.classList.add('trade-entry');
@@ -1152,7 +1178,7 @@ Effective trading volume ${volExample} ${currency}`;
         }
 
         function performReset() {
-            localStorage.clear(); 
+            localStorage.clear();  
             window.location.reload();
         }
 
@@ -1237,7 +1263,7 @@ Effective trading volume ${volExample} ${currency}`;
         async function fetchExchangeRate() {
             const select = document.getElementById('selectedCryptoSelect');
             if (select.options.length <= 1 && select.options[0].textContent.includes('Loading')) {
-                await new Promise(resolve => setTimeout(resolve, 500)); 
+                await new Promise(resolve => setTimeout(resolve, 500));  
             }
             const selectedOption = select.selectedOptions[0];
             if (!selectedOption) return;
@@ -1252,7 +1278,7 @@ Effective trading volume ${volExample} ${currency}`;
                     appSettings.cryptoPhpRate = rate;
                     document.getElementById('cryptoPhpRate').value = rate;
                 } else {
-                     document.getElementById('cryptoPhpRate').value = 0;
+                    document.getElementById('cryptoPhpRate').value = 0;
                 }
             } catch (error) {
                 console.error("Could not fetch live exchange rate, using saved value.", error);

@@ -1,6 +1,7 @@
 {
   "tradeHistory": [
     {
+      "currency": "USDT",
       "pair": "BTC/USDT",
       "orderNo": "579224314446912",
       "time": "2025-07-18 18:42",
@@ -9,6 +10,7 @@
       "effectiveVolume": 3.03
     },
     {
+      "currency": "USDT",
       "pair": "BTC/USDT",
       "orderNo": "579295468434752",
       "time": "2025-07-19 14:00",
@@ -17,6 +19,7 @@
       "effectiveVolume": 3.05
     },
     {
+      "currency": "USDT",
       "pair": "BTC/USDT",
       "orderNo": "579314097943136",
       "time": "2025-07-19 19:03",
@@ -25,6 +28,7 @@
       "effectiveVolume": 3.08
     },
     {
+      "currency": "USDT",
       "pair": "BTC/USDT",
       "orderNo": "579402433631680",
       "time": "2025-07-20 19:01",
@@ -33,6 +37,7 @@
       "effectiveVolume": 3.1
     },
     {
+      "currency": "USDT",
       "pair": "BTC/USDT",
       "orderNo": "579472662292512",
       "time": "2025-07-21 14:04",
@@ -41,6 +46,7 @@
       "effectiveVolume": 3.12
     },
     {
+      "currency": "USDT",
       "pair": "BTC/USDT",
       "orderNo": "579491036436768",
       "time": "2025-07-21 19:03",
@@ -49,6 +55,7 @@
       "effectiveVolume": 3.15
     },
     {
+      "currency": "USDT",
       "pair": "BTC/USDT",
       "orderNo": "579560936608960",
       "time": "2025-07-22 14:01",
@@ -57,6 +64,7 @@
       "effectiveVolume": 3.17
     },
     {
+      "currency": "USDT",
       "pair": "BTC/USDT",
       "orderNo": "579579592027456",
       "time": "2025-07-22 19:04",
@@ -65,217 +73,1020 @@
       "effectiveVolume": 3.19
     },
     {
+      "currency": "USDT",
       "pair": "BTC/USDT",
-      "orderNo": "579649545002400",
-      "time": "2025-07-23 14:03",
-      "pnl": 2.38,
-      "roi": 73.91,
-      "effectiveVolume": 3.22
+      "orderNo": "581569592027456",
+      "time": "2025-07-24 08:15",
+      "pnl": 2.15,
+      "roi": 71.67,
+      "effectiveVolume": 3
     },
     {
+      "currency": "USDT",
+      "pair": "ETH/USDT",
+      "orderNo": "581572349813921",
+      "time": "2025-07-24 09:02",
+      "pnl": -1.5,
+      "effectiveVolume": 3
+    },
+    {
+      "currency": "USDT",
+      "pair": "SOL/USDT",
+      "orderNo": "581575982374098",
+      "time": "2025-07-24 09:45",
+      "pnl": 3.2,
+      "roi": 91.43,
+      "effectiveVolume": 3.5
+    },
+    {
+      "currency": "USDT",
       "pair": "BTC/USDT",
-      "orderNo": "579667984794976",
-      "time": "2025-07-23 19:03",
-      "pnl": 2.42,
-      "roi": 74.69,
-      "effectiveVolume": 3.24
+      "orderNo": "581579123456789",
+      "time": "2025-07-24 10:11",
+      "pnl": 1.88,
+      "roi": 53.71,
+      "effectiveVolume": 3.5
+    },
+    {
+      "currency": "USDT",
+      "pair": "XRP/USDT",
+      "orderNo": "581582098765432",
+      "time": "2025-07-24 10:58",
+      "pnl": -2.1,
+      "effectiveVolume": 4
+    },
+    {
+      "currency": "USDT",
+      "pair": "ETH/USDT",
+      "orderNo": "581585432109876",
+      "time": "2025-07-24 11:23",
+      "pnl": 4.5,
+      "roi": 112.5,
+      "effectiveVolume": 4
+    },
+    {
+      "currency": "USDT",
+      "pair": "BTC/USDT",
+      "orderNo": "581588765432109",
+      "time": "2025-07-24 12:01",
+      "pnl": 2.75,
+      "roi": 68.75,
+      "effectiveVolume": 4
+    },
+    {
+      "currency": "USDT",
+      "pair": "DOGE/USDT",
+      "orderNo": "581591234567890",
+      "time": "2025-07-24 12:35",
+      "pnl": -0.95,
+      "effectiveVolume": 4.5
+    },
+    {
+      "currency": "USDT",
+      "pair": "SOL/USDT",
+      "orderNo": "581594987654321",
+      "time": "2025-07-24 13:14",
+      "pnl": 5.1,
+      "roi": 113.33,
+      "effectiveVolume": 4.5
+    },
+    {
+      "currency": "USDT",
+      "pair": "BTC/USDT",
+      "orderNo": "581598765432109",
+      "time": "2025-07-24 14:05",
+      "pnl": -3,
+      "effectiveVolume": 5
+    },
+    {
+      "currency": "USDT",
+      "pair": "ADA/USDT",
+      "orderNo": "581601234567891",
+      "time": "2025-07-24 14:32",
+      "pnl": 3.8,
+      "roi": 76,
+      "effectiveVolume": 5
+    },
+    {
+      "currency": "USDT",
+      "pair": "LINK/USDT",
+      "orderNo": "581604987654322",
+      "time": "2025-07-24 15:01",
+      "pnl": -2.5,
+      "effectiveVolume": 5.5
+    },
+    {
+      "currency": "USDT",
+      "pair": "MATIC/USDT",
+      "orderNo": "581608765432103",
+      "time": "2025-07-24 15:29",
+      "pnl": 6.2,
+      "roi": 112.73,
+      "effectiveVolume": 5.5
+    },
+    {
+      "currency": "USDT",
+      "pair": "BTC/USDT",
+      "orderNo": "581612345678904",
+      "time": "2025-07-24 16:05",
+      "pnl": -4.1,
+      "effectiveVolume": 6
+    },
+    {
+      "currency": "USDT",
+      "pair": "ETH/USDT",
+      "orderNo": "581615987654325",
+      "time": "2025-07-24 16:40",
+      "pnl": 5.9,
+      "roi": 98.33,
+      "effectiveVolume": 6
+    },
+    {
+      "currency": "USDT",
+      "pair": "SOL/USDT",
+      "orderNo": "581619765432106",
+      "time": "2025-07-24 17:15",
+      "pnl": 3.1,
+      "roi": 51.67,
+      "effectiveVolume": 6
+    },
+    {
+      "currency": "USDT",
+      "pair": "XRP/USDT",
+      "orderNo": "581623345678907",
+      "time": "2025-07-24 17:50",
+      "pnl": -1.8,
+      "effectiveVolume": 6.5
+    },
+    {
+      "currency": "USDT",
+      "pair": "ADA/USDT",
+      "orderNo": "581626987654328",
+      "time": "2025-07-24 18:22",
+      "pnl": 7.5,
+      "roi": 115.38,
+      "effectiveVolume": 6.5
+    },
+    {
+      "currency": "USDT",
+      "pair": "LINK/USDT",
+      "orderNo": "581630765432109",
+      "time": "2025-07-24 19:00",
+      "pnl": -3.2,
+      "effectiveVolume": 7
+    },
+    {
+      "currency": "USDT",
+      "pair": "BTC/USDT",
+      "orderNo": "581634345678910",
+      "time": "2025-07-24 19:45",
+      "pnl": 8.1,
+      "roi": 115.71,
+      "effectiveVolume": 7
+    },
+    {
+      "currency": "USDT",
+      "pair": "MATIC/USDT",
+      "orderNo": "581638123456781",
+      "time": "2025-07-24 20:10",
+      "pnl": 4.25,
+      "roi": 60.71,
+      "effectiveVolume": 7
+    },
+    {
+      "currency": "USDT",
+      "pair": "DOGE/USDT",
+      "orderNo": "581641890123452",
+      "time": "2025-07-24 20:35",
+      "pnl": -2.8,
+      "effectiveVolume": 7.5
+    },
+    {
+      "currency": "USDT",
+      "pair": "ADA/USDT",
+      "orderNo": "581645654321093",
+      "time": "2025-07-24 21:00",
+      "pnl": 9,
+      "roi": 120,
+      "effectiveVolume": 7.5
+    },
+    {
+      "currency": "USDT",
+      "pair": "ETH/USDT",
+      "orderNo": "581649418901234",
+      "time": "2025-07-24 21:25",
+      "pnl": -3.5,
+      "effectiveVolume": 8
+    },
+    {
+      "currency": "USDT",
+      "pair": "SOL/USDT",
+      "orderNo": "581653183481375",
+      "time": "2025-07-24 21:50",
+      "pnl": 7.8,
+      "roi": 97.5,
+      "effectiveVolume": 8
+    },
+    {
+      "currency": "USDT",
+      "pair": "BTC/USDT",
+      "orderNo": "581656948061516",
+      "time": "2025-07-24 22:15",
+      "pnl": 6.5,
+      "roi": 81.25,
+      "effectiveVolume": 8
+    },
+    {
+      "currency": "USDT",
+      "pair": "XRP/USDT",
+      "orderNo": "581660712641657",
+      "time": "2025-07-24 22:40",
+      "pnl": -4,
+      "effectiveVolume": 8.5
+    },
+    {
+      "currency": "USDT",
+      "pair": "LINK/USDT",
+      "orderNo": "581664477221798",
+      "time": "2025-07-24 23:05",
+      "pnl": 10.2,
+      "roi": 120,
+      "effectiveVolume": 8.5
+    },
+    {
+      "currency": "USDT",
+      "pair": "MATIC/USDT",
+      "orderNo": "581668241801939",
+      "time": "2025-07-24 23:30",
+      "pnl": -2.2,
+      "effectiveVolume": 9
+    },
+    {
+      "currency": "USDT",
+      "pair": "ADA/USDT",
+      "orderNo": "581672006382080",
+      "time": "2025-07-24 23:55",
+      "pnl": 11,
+      "roi": 122.22,
+      "effectiveVolume": 9
+    },
+    {
+      "currency": "USDT",
+      "pair": "BTC/USDT",
+      "orderNo": "581675770962221",
+      "time": "2025-07-25 00:20",
+      "pnl": -5.5,
+      "effectiveVolume": 9.5
+    },
+    {
+      "currency": "USDT",
+      "pair": "ETH/USDT",
+      "orderNo": "581679535542362",
+      "time": "2025-07-25 00:45",
+      "pnl": 9.8,
+      "roi": 103.16,
+      "effectiveVolume": 9.5
+    },
+    {
+      "currency": "USDT",
+      "pair": "SOL/USDT",
+      "orderNo": "581683300122503",
+      "time": "2025-07-25 01:10",
+      "pnl": 8.2,
+      "roi": 82,
+      "effectiveVolume": 10
+    },
+    {
+      "currency": "USDT",
+      "pair": "DOGE/USDT",
+      "orderNo": "581687064702644",
+      "time": "2025-07-25 01:35",
+      "pnl": -4.8,
+      "effectiveVolume": 10
+    },
+    {
+      "currency": "USDT",
+      "pair": "XRP/USDT",
+      "orderNo": "581690829282785",
+      "time": "2025-07-25 02:00",
+      "pnl": 12,
+      "roi": 120,
+      "effectiveVolume": 10
+    },
+    {
+      "currency": "USDT",
+      "pair": "LINK/USDT",
+      "orderNo": "581694593862926",
+      "time": "2025-07-25 02:25",
+      "pnl": -6.1,
+      "effectiveVolume": 10.5
+    },
+    {
+      "currency": "USDT",
+      "pair": "MATIC/USDT",
+      "orderNo": "581698358443067",
+      "time": "2025-07-25 02:50",
+      "pnl": 11.5,
+      "roi": 109.52,
+      "effectiveVolume": 10.5
+    },
+    {
+      "currency": "USDT",
+      "pair": "ADA/USDT",
+      "orderNo": "581702123023208",
+      "time": "2025-07-25 03:15",
+      "pnl": 9.5,
+      "roi": 86.36,
+      "effectiveVolume": 11
+    },
+    {
+      "currency": "USDT",
+      "pair": "BTC/USDT",
+      "orderNo": "581705887603349",
+      "time": "2025-07-25 03:40",
+      "pnl": -7,
+      "effectiveVolume": 11
+    },
+    {
+      "currency": "USDT",
+      "pair": "ETH/USDT",
+      "orderNo": "581709652183490",
+      "time": "2025-07-25 04:05",
+      "pnl": 13,
+      "roi": 113.04,
+      "effectiveVolume": 11.5
+    },
+    {
+      "currency": "USDT",
+      "pair": "SOL/USDT",
+      "orderNo": "581713416763631",
+      "time": "2025-07-25 04:30",
+      "pnl": -5.2,
+      "effectiveVolume": 11.5
+    },
+    {
+      "currency": "USDT",
+      "pair": "XRP/USDT",
+      "orderNo": "581717181343772",
+      "time": "2025-07-25 04:55",
+      "pnl": 14,
+      "roi": 116.67,
+      "effectiveVolume": 12
+    },
+    {
+      "currency": "USDT",
+      "pair": "DOGE/USDT",
+      "orderNo": "581720945923913",
+      "time": "2025-07-25 05:20",
+      "pnl": 8.8,
+      "roi": 73.33,
+      "effectiveVolume": 12
+    },
+    {
+      "currency": "USDT",
+      "pair": "LINK/USDT",
+      "orderNo": "581724710504054",
+      "time": "2025-07-25 05:45",
+      "pnl": -7.5,
+      "effectiveVolume": 12.5
+    },
+    {
+      "currency": "USDT",
+      "pair": "MATIC/USDT",
+      "orderNo": "581728475084195",
+      "time": "2025-07-25 06:10",
+      "pnl": 15,
+      "roi": 120,
+      "effectiveVolume": 12.5
+    },
+    {
+      "currency": "USDT",
+      "pair": "ADA/USDT",
+      "orderNo": "581732239664336",
+      "time": "2025-07-25 06:35",
+      "pnl": -6.8,
+      "effectiveVolume": 13
+    },
+    {
+      "currency": "USDT",
+      "pair": "BTC/USDT",
+      "orderNo": "581736004244477",
+      "time": "2025-07-25 07:00",
+      "pnl": 16,
+      "roi": 123.08,
+      "effectiveVolume": 13
+    },
+    {
+      "currency": "USDT",
+      "pair": "ETH/USDT",
+      "orderNo": "581739768824618",
+      "time": "2025-07-25 07:25",
+      "pnl": 12.5,
+      "roi": 92.59,
+      "effectiveVolume": 13.5
+    },
+    {
+      "currency": "USDT",
+      "pair": "SOL/USDT",
+      "orderNo": "581743533404759",
+      "time": "2025-07-25 07:50",
+      "pnl": -8,
+      "effectiveVolume": 13.5
+    },
+    {
+      "currency": "USDT",
+      "pair": "XRP/USDT",
+      "orderNo": "581747297984900",
+      "time": "2025-07-25 08:15",
+      "pnl": 17,
+      "roi": 121.43,
+      "effectiveVolume": 14
+    },
+    {
+      "currency": "USDT",
+      "pair": "DOGE/USDT",
+      "orderNo": "581751062565041",
+      "time": "2025-07-25 08:40",
+      "pnl": 10.5,
+      "roi": 75,
+      "effectiveVolume": 14
+    },
+    {
+      "currency": "USDT",
+      "pair": "LINK/USDT",
+      "orderNo": "581754827145182",
+      "time": "2025-07-25 09:05",
+      "pnl": -9,
+      "effectiveVolume": 14.5
+    },
+    {
+      "currency": "USDT",
+      "pair": "MATIC/USDT",
+      "orderNo": "581758591725323",
+      "time": "2025-07-25 09:30",
+      "pnl": 18,
+      "roi": 124.14,
+      "effectiveVolume": 14.5
+    },
+    {
+      "currency": "USDT",
+      "pair": "ADA/USDT",
+      "orderNo": "581762356305464",
+      "time": "2025-07-25 09:55",
+      "pnl": -8.5,
+      "effectiveVolume": 15
+    },
+    {
+      "currency": "USDT",
+      "pair": "BTC/USDT",
+      "orderNo": "581766120885605",
+      "time": "2025-07-25 10:20",
+      "pnl": 20,
+      "roi": 133.33,
+      "effectiveVolume": 15
+    },
+    {
+      "currency": "USDT",
+      "pair": "ETH/USDT",
+      "orderNo": "581769885465746",
+      "time": "2025-07-25 10:45",
+      "pnl": 14,
+      "roi": 90.32,
+      "effectiveVolume": 15.5
+    },
+    {
+      "currency": "USDT",
+      "pair": "SOL/USDT",
+      "orderNo": "581773650045887",
+      "time": "2025-07-25 11:10",
+      "pnl": -10,
+      "effectiveVolume": 15.5
+    },
+    {
+      "currency": "USDT",
+      "pair": "XRP/USDT",
+      "orderNo": "581777414626028",
+      "time": "2025-07-25 11:35",
+      "pnl": 22,
+      "roi": 137.5,
+      "effectiveVolume": 16
+    },
+    {
+      "currency": "USDT",
+      "pair": "DOGE/USDT",
+      "orderNo": "581781179206169",
+      "time": "2025-07-25 12:00",
+      "pnl": 12,
+      "roi": 75,
+      "effectiveVolume": 16
+    },
+    {
+      "currency": "USDT",
+      "pair": "LINK/USDT",
+      "orderNo": "581784943786310",
+      "time": "2025-07-25 12:25",
+      "pnl": -11,
+      "effectiveVolume": 16.5
+    },
+    {
+      "currency": "USDT",
+      "pair": "MATIC/USDT",
+      "orderNo": "581788708366451",
+      "time": "2025-07-25 12:50",
+      "pnl": 25,
+      "roi": 151.52,
+      "effectiveVolume": 16.5
+    },
+    {
+      "currency": "USDT",
+      "pair": "ADA/USDT",
+      "orderNo": "581792472946592",
+      "time": "2025-07-25 13:15",
+      "pnl": -10.5,
+      "effectiveVolume": 17
+    },
+    {
+      "currency": "USDT",
+      "pair": "BTC/USDT",
+      "orderNo": "581796237526733",
+      "time": "2025-07-25 13:40",
+      "pnl": 28,
+      "roi": 164.71,
+      "effectiveVolume": 17
+    },
+    {
+      "currency": "USDT",
+      "pair": "ETH/USDT",
+      "orderNo": "581800002106874",
+      "time": "2025-07-25 14:05",
+      "pnl": 18,
+      "roi": 102.86,
+      "effectiveVolume": 17.5
+    },
+    {
+      "currency": "USDT",
+      "pair": "SOL/USDT",
+      "orderNo": "581803766687015",
+      "time": "2025-07-25 14:30",
+      "pnl": -267.34,
+      "effectiveVolume": 17.5
     }
   ],
   "appSettings": {
-    "usdtPhpRate": 58.9,
+    "cryptoPhpRate": 56.65,
     "targetMonthlyIncomePhp": 50000,
-    "startingBalanceUsdt": 300.48,
+    "startingBalance": 300.48,
     "projectedGainPerTrade": 1,
     "tradesPerDay": 2,
-    "projectionPeriodDays": 15,
+    "projectionPeriodDays": 90,
     "projectedTradeAmount": 3,
     "projectedRoiPerTrade": 70,
     "selectedProjectionMethod": "percent",
     "theme": "light",
     "schedulePlanner": "",
-    "targetTradingVolume": 300
+    "targetTradingVolume": 300,
+    "selectedCrypto": "USDT"
   },
   "balanceData": {
-    "previousBalanceUsdt": 321.52000000000004,
-    "calculatedBalanceUsdt": 323.94,
-    "actualBalanceUsdt": 326.94
+    "previousBalance": 331.17,
+    "calculatedBalance": 337.9800000000001,
+    "actualBalance": 326.94
   },
   "lastTradeStats": {
-    "currentGainUsdt": 2.42,
-    "currentRoi": 74.69,
-    "previousGainUsdt": 2.38,
-    "lastTradeAmount": 3.24,
-    "previousTradeAmount": 3.22
+    "currentGain": -267.34,
+    "currentRoi": 0,
+    "previousGain": 18,
+    "lastTradeAmount": 17.5,
+    "previousTradeAmount": 17.5
   },
-  "cardStates": {
-    "calculatedGoalsCard": "expanded",
-    "financialGoalsCard": "expanded",
-    "processedHistoryCard": "collapsed"
-  },
+  "cardStates": {},
   "discrepancyHistory": [
     {
-      "time": "2025-07-24T01:29:51.575Z",
-      "value": -301
+      "time": "2025-07-24T04:06:22.822Z",
+      "value": -302.15
     },
     {
-      "time": "2025-07-24T01:30:03.042Z",
-      "value": -300.48
+      "time": "2025-07-24T04:06:27.474Z",
+      "value": -300.65
     },
     {
-      "time": "2025-07-24T01:30:09.400Z",
-      "value": -319.14000000000004
+      "time": "2025-07-24T04:06:33.305Z",
+      "value": -303.85
     },
     {
-      "time": "2025-07-24T01:30:17.410Z",
-      "value": 2.999999999999943
+      "time": "2025-07-24T04:06:38.711Z",
+      "value": -305.73
     },
     {
-      "time": "2025-07-24T01:32:23.063Z",
-      "value": 0.6199999999999477
+      "time": "2025-07-24T04:06:43.754Z",
+      "value": -303.63
     },
     {
-      "time": "2025-07-24T01:32:29.049Z",
-      "value": -1.8000000000000114
+      "time": "2025-07-24T04:06:51.620Z",
+      "value": -308.13
     },
     {
-      "time": "2025-07-24T01:32:51.512Z",
-      "value": 3
+      "time": "2025-07-24T04:06:56.563Z",
+      "value": -310.88
     },
     {
-      "time": "2025-07-24T01:34:02.518Z",
-      "value": 3
+      "time": "2025-07-24T04:07:01.396Z",
+      "value": -309.93
     },
     {
-      "time": "2025-07-24T01:34:13.042Z",
-      "value": 3
+      "time": "2025-07-24T04:07:06.456Z",
+      "value": -315.03
     },
     {
-      "time": "2025-07-24T01:34:26.776Z",
-      "value": 3
+      "time": "2025-07-24T04:07:11.122Z",
+      "value": -312.03
     },
     {
-      "time": "2025-07-24T01:47:03.214Z",
-      "value": 3
+      "time": "2025-07-24T04:07:21.295Z",
+      "value": 10.110000000000014
     },
     {
-      "time": "2025-07-24T01:48:43.076Z",
-      "value": 3
+      "time": "2025-07-24T04:07:48.071Z",
+      "value": -8.550000000000011
     },
     {
-      "time": "2025-07-24T02:12:42.120Z",
-      "value": 3
+      "time": "2025-07-24T04:08:38.454Z",
+      "value": -3.75
     },
     {
-      "time": "2025-07-24T02:14:29.683Z",
-      "value": 3
+      "time": "2025-07-24T04:44:18.733Z",
+      "value": -3.75
     },
     {
-      "time": "2025-07-24T02:15:30.407Z",
-      "value": 3
+      "time": "2025-07-24T04:44:32.395Z",
+      "value": -4.230000000000018
+    },
+    {
+      "time": "2025-07-24T04:44:43.485Z",
+      "value": -11.040000000000077
     }
   ],
-  "cumulativeBalanceHistory": [
-    {
-      "time": "2025-07-18 18:42",
-      "balance": 302.75
-    },
-    {
-      "time": "2025-07-19 14:00",
-      "balance": 305.03
-    },
-    {
-      "time": "2025-07-19 19:03",
-      "balance": 307.61999999999995
-    },
-    {
-      "time": "2025-07-20 19:01",
-      "balance": 309.92999999999995
-    },
-    {
-      "time": "2025-07-21 14:04",
-      "balance": 312.25999999999993
-    },
-    {
-      "time": "2025-07-21 19:03",
-      "balance": 314.47999999999996
-    },
-    {
-      "time": "2025-07-22 14:01",
-      "balance": 316.78
-    },
-    {
-      "time": "2025-07-22 19:04",
-      "balance": 319.14
-    },
-    {
-      "time": "2025-07-23 14:03",
-      "balance": 321.52
-    },
-    {
-      "time": "2025-07-23 19:03",
-      "balance": 323.94
-    }
-  ],
+  "cumulativeBalanceHistory": [],
   "projectedGrowthHistory": [
     {
-      "time": "2025-07-24T02:15:30.407Z",
-      "balance": 330.451194
+      "time": "2025-07-24T04:44:43.485Z",
+      "balance": 344.77339800000004
     },
     {
-      "time": "2025-07-25T02:15:30.407Z",
-      "balance": 337.0932629994
+      "time": "2025-07-25T04:44:43.485Z",
+      "balance": 351.70334329980005
     },
     {
-      "time": "2025-07-26T02:15:30.407Z",
-      "balance": 343.8688375856879
+      "time": "2025-07-26T04:44:43.485Z",
+      "balance": 358.772580500126
     },
     {
-      "time": "2025-07-27T02:15:30.407Z",
-      "balance": 350.7806012211602
+      "time": "2025-07-27T04:44:43.485Z",
+      "balance": 365.98390936817856
     },
     {
-      "time": "2025-07-28T02:15:30.407Z",
-      "balance": 357.8312913057055
+      "time": "2025-07-28T04:44:43.485Z",
+      "balance": 373.340185946479
     },
     {
-      "time": "2025-07-29T02:15:30.407Z",
-      "balance": 365.0237002609502
+      "time": "2025-07-29T04:44:43.485Z",
+      "balance": 380.8443236840032
     },
     {
-      "time": "2025-07-30T02:15:30.407Z",
-      "balance": 372.3606766361953
+      "time": "2025-07-30T04:44:43.485Z",
+      "balance": 388.4992945900517
     },
     {
-      "time": "2025-07-31T02:15:30.407Z",
-      "balance": 379.84512623658287
+      "time": "2025-07-31T04:44:43.485Z",
+      "balance": 396.30813041131177
     },
     {
-      "time": "2025-08-01T02:15:30.407Z",
-      "balance": 387.48001327393814
+      "time": "2025-08-01T04:44:43.485Z",
+      "balance": 404.27392383257916
     },
     {
-      "time": "2025-08-02T02:15:30.407Z",
-      "balance": 395.2683615407443
+      "time": "2025-08-02T04:44:43.485Z",
+      "balance": 412.399829701614
     },
     {
-      "time": "2025-08-03T02:15:30.407Z",
-      "balance": 403.2132556077133
+      "time": "2025-08-03T04:44:43.485Z",
+      "balance": 420.68906627861645
     },
     {
-      "time": "2025-08-04T02:15:30.407Z",
-      "balance": 411.31784204542834
+      "time": "2025-08-04T04:44:43.485Z",
+      "balance": 429.14491651081664
     },
     {
-      "time": "2025-08-05T02:15:30.407Z",
-      "balance": 419.58533067054145
+      "time": "2025-08-05T04:44:43.485Z",
+      "balance": 437.7707293326841
     },
     {
-      "time": "2025-08-06T02:15:30.407Z",
-      "balance": 428.01899581701934
+      "time": "2025-08-06T04:44:43.485Z",
+      "balance": 446.5699209922711
     },
     {
-      "time": "2025-08-07T02:15:30.407Z",
-      "balance": 436.62217763294143
+      "time": "2025-08-07T04:44:43.485Z",
+      "balance": 455.5459764042157
+    },
+    {
+      "time": "2025-08-08T04:44:43.485Z",
+      "balance": 464.70245052994045
+    },
+    {
+      "time": "2025-08-09T04:44:43.485Z",
+      "balance": 474.0429697855922
+    },
+    {
+      "time": "2025-08-10T04:44:43.485Z",
+      "balance": 483.57123347828264
+    },
+    {
+      "time": "2025-08-11T04:44:43.485Z",
+      "balance": 493.29101527119616
+    },
+    {
+      "time": "2025-08-12T04:44:43.485Z",
+      "balance": 503.20616467814716
+    },
+    {
+      "time": "2025-08-13T04:44:43.485Z",
+      "balance": 513.320608588178
+    },
+    {
+      "time": "2025-08-14T04:44:43.485Z",
+      "balance": 523.6383528208003
+    },
+    {
+      "time": "2025-08-15T04:44:43.485Z",
+      "balance": 534.1634837124983
+    },
+    {
+      "time": "2025-08-16T04:44:43.485Z",
+      "balance": 544.9001697351194
+    },
+    {
+      "time": "2025-08-17T04:44:43.485Z",
+      "balance": 555.8526631467953
+    },
+    {
+      "time": "2025-08-18T04:44:43.485Z",
+      "balance": 567.025301676046
+    },
+    {
+      "time": "2025-08-19T04:44:43.485Z",
+      "balance": 578.4225102397345
+    },
+    {
+      "time": "2025-08-20T04:44:43.485Z",
+      "balance": 590.0488026955531
+    },
+    {
+      "time": "2025-08-21T04:44:43.485Z",
+      "balance": 601.9087836297338
+    },
+    {
+      "time": "2025-08-22T04:44:43.485Z",
+      "balance": 614.0071501806914
+    },
+    {
+      "time": "2025-08-23T04:44:43.485Z",
+      "balance": 626.3486938993233
+    },
+    {
+      "time": "2025-08-24T04:44:43.485Z",
+      "balance": 638.9383026466996
+    },
+    {
+      "time": "2025-08-25T04:44:43.485Z",
+      "balance": 651.7809625298984
+    },
+    {
+      "time": "2025-08-26T04:44:43.485Z",
+      "balance": 664.8817598767494
+    },
+    {
+      "time": "2025-08-27T04:44:43.485Z",
+      "balance": 678.245883250272
+    },
+    {
+      "time": "2025-08-28T04:44:43.485Z",
+      "balance": 691.8786255036024
+    },
+    {
+      "time": "2025-08-29T04:44:43.485Z",
+      "balance": 705.7853858762248
+    },
+    {
+      "time": "2025-08-30T04:44:43.485Z",
+      "balance": 719.971672132337
+    },
+    {
+      "time": "2025-08-31T04:44:43.485Z",
+      "balance": 734.443102742197
+    },
+    {
+      "time": "2025-09-01T04:44:43.485Z",
+      "balance": 749.2054091073151
+    },
+    {
+      "time": "2025-09-02T04:44:43.485Z",
+      "balance": 764.264437830372
+    },
+    {
+      "time": "2025-09-03T04:44:43.485Z",
+      "balance": 779.6261530307626
+    },
+    {
+      "time": "2025-09-04T04:44:43.485Z",
+      "balance": 795.2966387066809
+    },
+    {
+      "time": "2025-09-05T04:44:43.485Z",
+      "balance": 811.2821011446852
+    },
+    {
+      "time": "2025-09-06T04:44:43.485Z",
+      "balance": 827.5888713776933
+    },
+    {
+      "time": "2025-09-07T04:44:43.485Z",
+      "balance": 844.2234076923849
+    },
+    {
+      "time": "2025-09-08T04:44:43.485Z",
+      "balance": 861.1922981870017
+    },
+    {
+      "time": "2025-09-09T04:44:43.485Z",
+      "balance": 878.5022633805605
+    },
+    {
+      "time": "2025-09-10T04:44:43.485Z",
+      "balance": 896.1601588745098
+    },
+    {
+      "time": "2025-09-11T04:44:43.485Z",
+      "balance": 914.1729780678875
+    },
+    {
+      "time": "2025-09-12T04:44:43.485Z",
+      "balance": 932.5478549270521
+    },
+    {
+      "time": "2025-09-13T04:44:43.485Z",
+      "balance": 951.2920668110859
+    },
+    {
+      "time": "2025-09-14T04:44:43.485Z",
+      "balance": 970.4130373539887
+    },
+    {
+      "time": "2025-09-15T04:44:43.485Z",
+      "balance": 989.9183394048039
+    },
+    {
+      "time": "2025-09-16T04:44:43.485Z",
+      "balance": 1009.8156980268404
+    },
+    {
+      "time": "2025-09-17T04:44:43.485Z",
+      "balance": 1030.1129935571798
+    },
+    {
+      "time": "2025-09-18T04:44:43.485Z",
+      "balance": 1050.8182647276792
+    },
+    {
+      "time": "2025-09-19T04:44:43.485Z",
+      "balance": 1071.9397118487054
+    },
+    {
+      "time": "2025-09-20T04:44:43.485Z",
+      "balance": 1093.4857000568643
+    },
+    {
+      "time": "2025-09-21T04:44:43.485Z",
+      "balance": 1115.4647626280073
+    },
+    {
+      "time": "2025-09-22T04:44:43.485Z",
+      "balance": 1137.8856043568303
+    },
+    {
+      "time": "2025-09-23T04:44:43.485Z",
+      "balance": 1160.7571050044025
+    },
+    {
+      "time": "2025-09-24T04:44:43.485Z",
+      "balance": 1184.088322814991
+    },
+    {
+      "time": "2025-09-25T04:44:43.485Z",
+      "balance": 1207.8884981035724
+    },
+    {
+      "time": "2025-09-26T04:44:43.485Z",
+      "balance": 1207.8884981035724
+    },
+    {
+      "time": "2025-09-27T04:44:43.485Z",
+      "balance": 1207.8884981035724
+    },
+    {
+      "time": "2025-09-28T04:44:43.485Z",
+      "balance": 1207.8884981035724
+    },
+    {
+      "time": "2025-09-29T04:44:43.485Z",
+      "balance": 1207.8884981035724
+    },
+    {
+      "time": "2025-09-30T04:44:43.485Z",
+      "balance": 1207.8884981035724
+    },
+    {
+      "time": "2025-10-01T04:44:43.485Z",
+      "balance": 1207.8884981035724
+    },
+    {
+      "time": "2025-10-02T04:44:43.485Z",
+      "balance": 1207.8884981035724
+    },
+    {
+      "time": "2025-10-03T04:44:43.485Z",
+      "balance": 1207.8884981035724
+    },
+    {
+      "time": "2025-10-04T04:44:43.485Z",
+      "balance": 1207.8884981035724
+    },
+    {
+      "time": "2025-10-05T04:44:43.485Z",
+      "balance": 1207.8884981035724
+    },
+    {
+      "time": "2025-10-06T04:44:43.485Z",
+      "balance": 1207.8884981035724
+    },
+    {
+      "time": "2025-10-07T04:44:43.485Z",
+      "balance": 1207.8884981035724
+    },
+    {
+      "time": "2025-10-08T04:44:43.485Z",
+      "balance": 1207.8884981035724
+    },
+    {
+      "time": "2025-10-09T04:44:43.485Z",
+      "balance": 1207.8884981035724
+    },
+    {
+      "time": "2025-10-10T04:44:43.485Z",
+      "balance": 1207.8884981035724
+    },
+    {
+      "time": "2025-10-11T04:44:43.485Z",
+      "balance": 1207.8884981035724
+    },
+    {
+      "time": "2025-10-12T04:44:43.485Z",
+      "balance": 1207.8884981035724
+    },
+    {
+      "time": "2025-10-13T04:44:43.485Z",
+      "balance": 1207.8884981035724
+    },
+    {
+      "time": "2025-10-14T04:44:43.485Z",
+      "balance": 1207.8884981035724
+    },
+    {
+      "time": "2025-10-15T04:44:43.485Z",
+      "balance": 1207.8884981035724
+    },
+    {
+      "time": "2025-10-16T04:44:43.485Z",
+      "balance": 1207.8884981035724
+    },
+    {
+      "time": "2025-10-17T04:44:43.485Z",
+      "balance": 1207.8884981035724
+    },
+    {
+      "time": "2025-10-18T04:44:43.485Z",
+      "balance": 1207.8884981035724
+    },
+    {
+      "time": "2025-10-19T04:44:43.485Z",
+      "balance": 1207.8884981035724
+    },
+    {
+      "time": "2025-10-20T04:44:43.485Z",
+      "balance": 1207.8884981035724
+    },
+    {
+      "time": "2025-10-21T04:44:43.485Z",
+      "balance": 1207.8884981035724
     }
   ]
 }
